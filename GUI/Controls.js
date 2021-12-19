@@ -55,7 +55,7 @@ function createControls()
         this.timeMinute = initDate.getMinutes();
         this.timeSecond = initDate.getSeconds();
         this.GitHub = function() {
-            window.open("https://github.com/vsr83/ISSLive_Sun", "_blank").focus();
+            window.open("https://github.com/vsr83/OrbitsGL", "_blank").focus();
         };
         this.warpSeconds = 60;
         this.timeWarp = false;
