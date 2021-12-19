@@ -1,0 +1,80 @@
+body {
+  margin: 0;
+  border: 0;
+  padding: 0;
+
+}
+#canvas {
+  position: absolute !important;
+  left: 0;
+  right: 0;
+  border: none;
+  outline: none;
+}
+
+.container {
+  position: absolute;
+  border: none;
+  outline: none;
+}
+
+#dateText
+{
+    color: #fff;
+    position : absolute;
+    top : 10px;
+    left : 10px;
+    z-index : 11;
+    background-color: #700000;
+    opacity: 1;
+    font-size: 15px;
+    font-family : monospace;
+    padding-left : 20px;
+    padding-right : 20px;
+}
+
+#dateContainer
+{
+    width: 700px;
+    color: #fff;
+    position : absolute;
+    top : 10px;
+    left : 10px;
+    z-index : 11;
+    background-color: RED;
+    opacity: 0.5;
+    font-size: 15px;
+    font-family : monospace;
+    z-index : 6;
+}
+
+#warningText
+{
+    color: #fff;
+    position : absolute;
+    top : 10px;
+    left : 10px;
+    z-index : 11;
+    background-color: #700000;
+    opacity: 1;
+    font-size: 15px;
+    font-family : monospace;
+    padding-left : 20px;
+    padding-right : 20px;
+}
+
+#warningContainer
+{
+    width: 300px;
+    color: #fff;
+    position : absolute;
+    top : 10px;
+    left : 10px;
+    z-index : 11;
+    background-color: RED;
+    opacity: 0.5;
+    font-size: 15px;
+    font-family : monospace;
+    z-index : 6;
+}
+

@@ -1,0 +1,35 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="app.css">
+    </head>
+    <body style="background: black; color: white; overflow-y: hidden; overflow-x: hidden">
+
+    <div class="container" id="container">
+        <!--div id="warningContainer"><div id="warningText"><p>LOADING</p></div></div-->
+        <div id="dateContainer"><div id="dateText"><p>LOADING</p></div></div>
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <script src="ISSLive/lightstreamer.min.js"></script>
+    <script src="computation/Coordinates.js"></script>
+    <script src="computation/Frames.js"></script>
+    <script src="computation/Nutation.js"></script>
+    <script src="computation/Kepler.js"></script>
+    <script src="computation/TimeConversions.js"></script>
+    <script src="computation/Orbits.js"></script>
+    <script src="computation/SunAltitude.js"></script>
+    <script src="computation/MathUtils.js"></script>
+    <script src="computation/MoonAltitude.js"></script>
+    <script src="ISSLive/OEMSource.js"></script>
+    <script src="ISSLive/Telemetry.js"></script>
+    <script src="GUI/Controls.js"></script>
+
+    <script src="imports/m4.js"></script>
+    <script src="imports/dat.gui.min.js"></script>
+    <script src="imports/WebGLUtils.js"></script>
+
+    <script src="shaders/LineShaders.js"></script>
+    <script src="shaders/PlanetShaders.js"></script>
+    <script src="app.js"></script>
+    </body>
+</html>
