@@ -3,28 +3,30 @@
 var gl = null;
 var earthShaders = null;
 var lineShaders = null;
+
+// Semi-major and semi-minor axes of the WGS84 ellipsoid.
 var a = 6378.1370;
 var b = 6356.75231414;
 
+// Camera distance from Earth.
 var distance = 5.0 * a;
 
-function degToRad(d) 
-{
-    return d * Math.PI / 180;
-}
 
 createControls();
 
 // Delta time (ms) from configuration of date and time.
 var dateDelta = 0;
 
-var fieldOfViewRadians = degToRad(30);
-var rotX = degToRad(90);
-var rotY = degToRad(0);
-var rotZ = degToRad(0);
+// Field of view.
+var fieldOfViewRadians = MathUtils.deg2Rad(30);
+
+// Rotation.
+var rotX = MathUtils.deg2Rad(90);
+var rotY = MathUtils.deg2Rad(0);
+var rotZ = MathUtils.deg2Rad(0);
+
 var xStart = 0;
 var yStart = 0;
-
 var dragX = 0;
 var dragY = 0;
 var dragXStart = 0;
@@ -32,11 +34,7 @@ var dragYStart = 0;
 
 var drawing = false;
 
-// Get the starting time.
-var then = 0;
-
 // Get A WebGL context
-/** @type {HTMLCanvasElement} */
 var canvas = document.querySelector("#canvas");
 
 canvas.addEventListener("mousedown", function(e) {
@@ -197,10 +195,10 @@ function drawScene(time)
                 };
     }
 
+    // Compute Julian date and time:
     const julianTimes = TimeConversions.computeJulianTime(today);
     const JD = julianTimes.JD;
     const JT = julianTimes.JT;
-    const JDref = Math.ceil(TimeConversions.computeJulianDay(2000, 1, 1));
 
     // Compute equitorial coordinates of the Sun.
     const sunAltitude = new SunAltitude();
@@ -218,23 +216,37 @@ function drawScene(time)
     // floats in the shader:
     const LST = MathUtils.deg2Rad(TimeConversions.computeSiderealTime(0, JD, JT)) % 360.0;
 
+    // Convert OSV to Osculating Keplerian elements.
     ISS.kepler = Kepler.osvToKepler(ISS.osv.r, ISS.osv.v, ISS.osv.ts);
+
+    // Propagate OSV using Osculating Keplerian elements.
     ISS.osvProp = Kepler.propagate(ISS.kepler, today);
+
+    // Compute updated keplerian elements from the propagated OSV.
     let kepler_updated = Kepler.osvToKepler(ISS.osvProp.r, ISS.osvProp.v, ISS.osvProp.ts);
+
+    // Convert propagated OSV from J2000 to ECEF frame.
     let osv_ECEF = Frames.osvJ2000ToECEF(ISS.osvProp);
     ISS.r_ECEF = osv_ECEF.r;
     ISS.v_ECEF = osv_ECEF.v;
-    let wgs84 = Coordinates.cartToWgs84(ISS.r_ECEF);
 
+    // Extract the coordinates on the WGS84 ellipsoid.
+    let wgs84 = Coordinates.cartToWgs84(ISS.r_ECEF);
     ISS.alt = wgs84.h; 
     ISS.lon = wgs84.lon;
     ISS.lat = wgs84.lat;
+
+    // Distance from the origin in ECEF frame.
     const alt = MathUtils.norm(ISS.r_ECEF);
+
+    // Compute longitude and latitude of the Sun and the Moon.
     let lonlat = sunAltitude.computeSunLonLat(rASun, declSun, JD, JT);
     let lonlatMoon = sunAltitude.computeSunLonLat(rAMoon, declMoon, JD, JT);
 
+    // Update captions.
     updateCaptions(rASun, declSun, lonlat, rAMoon, declMoon, lonlatMoon, today, JT);
 
+    // Compute the position of the ISS. TODO: sign convention.
     ISS.x = -alt * 0.001 * MathUtils.cosd(ISS.lat) * MathUtils.cosd(ISS.lon);
     ISS.y =  alt * 0.001 * MathUtils.cosd(ISS.lat) * MathUtils.sind(ISS.lon);
     ISS.z = -alt * 0.001 * MathUtils.sind(ISS.lat);
@@ -243,27 +255,20 @@ function drawScene(time)
     gl.clearColor(0, 0, 0, 255);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    // convert to seconds
-    time *= 0.001;
-    // Subtract the previous time from the current time
-    var deltaTime = time - then;
-    // Remember the current time for the next frame.
-    then = time;
-
     resizeCanvasToDisplaySize(gl.canvas);
 
-    // Tell WebGL how to convert from clip space to pixels
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.CULL_FACE);
 
-    // Compute the matrix
+    // Compute the projection matrix.
     fieldOfViewRadians = MathUtils.deg2Rad(guiControls.fov);
     var aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
     var zNear = (distance - b) / 2;
     var zFar = a * 100.0;
     var projectionMatrix = m4.perspective(fieldOfViewRadians, aspect, zNear, zFar);
-
+    
+    // Camera position in the clip space.
     var cameraPosition = [0, 0, distance];
     var up = [0, 1, 0];
     var target = [0, 0, 0];
@@ -323,6 +328,7 @@ function drawScene(time)
         const y = alt * 0.001 * MathUtils.cosd(lat) * MathUtils.sind(lon);
         const z = alt * 0.001 * MathUtils.sind(lat);
 
+        // TODO: 
         p.push([-x, y, -z]);
         if (jdDelta != -period)
         {
@@ -340,6 +346,7 @@ function drawScene(time)
         lineShaders.setGeometry(p);
         lineShaders.draw(matrix);
 
+        // The satellite is replaced with a smaller sphere without textures, map nor grid.
         let issMatrix = m4.translate(matrix, ISS.x, ISS.y, ISS.z);
         issMatrix = m4.scale(issMatrix, 0.01, 0.01, 0.01);
         earthShaders.draw(issMatrix, rASun, declSun, LST, false, false, false, null);
@@ -358,6 +365,7 @@ function drawScene(time)
         const ySun = D * MathUtils.cosd(lonlat.lat) * MathUtils.sind(lonlat.lon);
         const zSun = D * MathUtils.sind(lonlat.lat);        
 
+        // TODO:
         let sunMatrix = m4.translate(matrix, -xSun, ySun, zSun);
         sunMatrix = m4.scale(sunMatrix, scale, scale, scale);
         earthShaders.draw(sunMatrix, rASun, declSun, LST, false, false, false, null);
@@ -369,6 +377,7 @@ function drawScene(time)
             const ySun = D * MathUtils.cosd(lonlat.lat) * MathUtils.sind(lonlat.lon + lonDelta);
             const zSun = D * MathUtils.sind(lonlat.lat);  
             
+            // TODO:
             pSun.push([-xSun, ySun, zSun]);
             if (lonDelta != 0.0)
             {
@@ -376,7 +385,6 @@ function drawScene(time)
             }
         }
         pSun.push(pSun[pSun.length - 1]);
-        //console.log(pSun);
         lineShaders.setGeometry(pSun);
         lineShaders.draw(matrix);
     }

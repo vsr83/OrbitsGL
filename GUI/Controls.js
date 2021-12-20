@@ -201,9 +201,23 @@ function createControls()
     textFolder.add(guiControls, 'showIssLocation').onChange(requestFrame);
     textFolder.add(guiControls, 'showIssElements').onChange(requestFrame);
  
+
+
     const dataFolder = gui.addFolder('Source');
-    osvControls.enableTelemetry = dataFolder.add(guiControls, 'enableTelemetry').onChange(requestFrame);
-    osvControls.enableOEM = dataFolder.add(guiControls, 'enableOEM').onChange(requestFrame);
+    osvControls.enableTelemetry = dataFolder.add(guiControls, 'enableTelemetry').onChange(function(state)
+    {
+        if (state)
+        {
+            osvControls.enableOEM.setValue(0);
+        }
+    });
+    osvControls.enableOEM = dataFolder.add(guiControls, 'enableOEM').onChange(function(state) 
+    {
+        if (state)
+        {
+            osvControls.enableTelemetry.setValue(0);
+        }
+    });
     osvControls.enableClock = dataFolder.add(guiControls, 'enableClock').onChange(requestFrame);
     osvControls.osvYear = dataFolder.add(guiControls, 'osvYear', 1980, 2040, 1).onChange(requestFrame);
     osvControls.osvMonth = dataFolder.add(guiControls, 'osvMonth', 1, 12, 1).onChange(requestFrame);

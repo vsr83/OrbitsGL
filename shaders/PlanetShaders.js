@@ -685,6 +685,8 @@ class PlanetShaders
                 const xEnd = gridCoeff * this.a * MathUtils.cosd(latEnd) * MathUtils.cosd(lonEnd);
                 const yEnd = gridCoeff * this.a * MathUtils.cosd(latEnd) * MathUtils.sind(lonEnd);
                 const zEnd = gridCoeff * this.b * MathUtils.sind(latEnd);
+
+                // TODO:
                 points.push([-xStart, yStart, -zStart]);
                 points.push([-xEnd, yEnd, -zEnd]);
                 nLines++;
