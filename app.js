@@ -401,14 +401,14 @@ function updateCaptions(rA, decl, lonlat, rAMoon, declMoon, lonlatMoon, today, J
     let delay = (today - ISS.osv.ts) / 1000;
     if (Math.abs(delay) > 1000)
     {
-        //warningContainer.style.visibility = "visible";
-        //warningText.style.visibility = "visible";
-        //warningText.innerHTML = "WARNING: <br> OSV age: " + Math.floor(Math.abs(delay)) + "s > 1000s";
+        warningContainer.style.visibility = "visible";
+        warningText.style.visibility = "visible";
+        warningText.innerHTML = "WARNING: <br> OSV age: " + Math.floor(Math.abs(delay)) + "s > 1000s";
     }
     else 
     {
-        //warningContainer.style.visibility = "hidden";
-        //warningText.style.visibility = "hidden";
+        warningContainer.style.visibility = "hidden";
+        warningText.style.visibility = "hidden";
     }
 
     if (guiControls.showLocal)
