@@ -21,10 +21,11 @@ var dateDelta = 0;
 var fieldOfViewRadians = MathUtils.deg2Rad(30);
 
 // Rotation.
-var rotX = MathUtils.deg2Rad(90);
+var rotX = MathUtils.deg2Rad(-90);
 var rotY = MathUtils.deg2Rad(0);
 var rotZ = MathUtils.deg2Rad(0);
 
+// Handling of the mouse dragging.
 var xStart = 0;
 var yStart = 0;
 var dragX = 0;
@@ -40,8 +41,8 @@ var canvas = document.querySelector("#canvas");
 canvas.addEventListener("mousedown", function(e) {
     xStart = e.clientX;
     yStart = e.clientY;
-    dragXStart = dragX;
-    dragYStart = dragY;
+    dragXStart = -rotZ;
+    dragYStart = -rotX - 90;
 
     console.log("xStart " + xStart);
 
@@ -50,8 +51,8 @@ canvas.addEventListener("mousedown", function(e) {
         dragX = dragXStart - (m.clientX - xStart) / 100.0;
         dragY = dragYStart - (m.clientY - yStart) / 100.0;
 
-        rotZ = dragX;
-        rotX = 90 - dragY;
+        rotZ = -dragX;
+        rotX = -90 - dragY;
     }
 });
 
@@ -204,7 +205,7 @@ function drawScene(time)
     const sunAltitude = new SunAltitude();
     const eqCoordsSun = sunAltitude.computeEquitorial(JT, JD);
     const rASun = eqCoordsSun.rA;
-    const declSun = -eqCoordsSun.decl;
+    const declSun = eqCoordsSun.decl;
 
     // Compute equitorial coordinates of the Moon.
     const moonAltitude = new MoonAltitude();
@@ -241,15 +242,15 @@ function drawScene(time)
 
     // Compute longitude and latitude of the Sun and the Moon.
     let lonlat = sunAltitude.computeSunLonLat(rASun, declSun, JD, JT);
-    let lonlatMoon = sunAltitude.computeSunLonLat(rAMoon, declMoon, JD, JT);
+    let lonlatMoon = moonAltitude.computeMoonLonLat(rAMoon, declMoon, JD, JT);
 
     // Update captions.
     updateCaptions(rASun, declSun, lonlat, rAMoon, declMoon, lonlatMoon, today, JT);
 
-    // Compute the position of the ISS. TODO: sign convention.
-    ISS.x = -alt * 0.001 * MathUtils.cosd(ISS.lat) * MathUtils.cosd(ISS.lon);
-    ISS.y =  alt * 0.001 * MathUtils.cosd(ISS.lat) * MathUtils.sind(ISS.lon);
-    ISS.z = -alt * 0.001 * MathUtils.sind(ISS.lat);
+    // Compute the position of the ISS.
+    ISS.x = alt * 0.001 * MathUtils.cosd(ISS.lat) * MathUtils.cosd(ISS.lon);
+    ISS.y = alt * 0.001 * MathUtils.cosd(ISS.lat) * MathUtils.sind(ISS.lon);
+    ISS.z = alt * 0.001 * MathUtils.sind(ISS.lat);
 
     // Clear the canvas
     gl.clearColor(0, 0, 0, 255);
@@ -283,11 +284,11 @@ function drawScene(time)
 
     if (guiControls.lockLonRot)
     {
-        rotZ = MathUtils.deg2Rad(ISS.lon - 90);
+        rotZ = MathUtils.deg2Rad(-90 - ISS.lon);
     }
     if (guiControls.lockLatRot)
     {
-        rotX = MathUtils.deg2Rad(90 + ISS.lat);
+        rotX = MathUtils.deg2Rad(-90 + ISS.lat);
     }
 
     var matrix = m4.xRotate(viewProjectionMatrix, rotX);
@@ -314,6 +315,7 @@ function drawScene(time)
     // Division by 100.0 leads to numerical issues.
     const jdStep = period / 100.01;
 
+    // Draw orbit.
     for (let jdDelta = -period; jdDelta <= period; jdDelta += jdStep)
     {
         const deltaDate = new Date(today.getTime() +  1000 * jdDelta);
@@ -328,15 +330,12 @@ function drawScene(time)
         const y = alt * 0.001 * MathUtils.cosd(lat) * MathUtils.sind(lon);
         const z = alt * 0.001 * MathUtils.sind(lat);
 
-        // TODO: 
-        p.push([-x, y, -z]);
+        p.push([x, y, z]);
         if (jdDelta != -period)
         {
-            p.push([-x, y, -z]);
+            p.push([x, y, z]);
         }
     }
-    p.push(p[p.length - 1]);
-    p.push(p[p.length - 1]);
     p.push(p[p.length - 1]);
     p.push([ISS.x, ISS.y, ISS.z]);
     p.push([0, 0, 0]);
@@ -365,8 +364,7 @@ function drawScene(time)
         const ySun = D * MathUtils.cosd(lonlat.lat) * MathUtils.sind(lonlat.lon);
         const zSun = D * MathUtils.sind(lonlat.lat);        
 
-        // TODO:
-        let sunMatrix = m4.translate(matrix, -xSun, ySun, zSun);
+        let sunMatrix = m4.translate(matrix, xSun, ySun, zSun);
         sunMatrix = m4.scale(sunMatrix, scale, scale, scale);
         earthShaders.draw(sunMatrix, rASun, declSun, LST, false, false, false, null);
 
@@ -377,11 +375,10 @@ function drawScene(time)
             const ySun = D * MathUtils.cosd(lonlat.lat) * MathUtils.sind(lonlat.lon + lonDelta);
             const zSun = D * MathUtils.sind(lonlat.lat);  
             
-            // TODO:
-            pSun.push([-xSun, ySun, zSun]);
+            pSun.push([xSun, ySun, zSun]);
             if (lonDelta != 0.0)
             {
-                pSun.push([-xSun, ySun, zSun]);
+                pSun.push([xSun, ySun, zSun]);
             }
         }
         pSun.push(pSun[pSun.length - 1]);
@@ -389,7 +386,6 @@ function drawScene(time)
         lineShaders.draw(matrix);
     }
 
-    //earthShaders.draw(matrix, rASun, declSun, LST);
     // Call drawScene again next frame
     requestAnimationFrame(drawScene);
 

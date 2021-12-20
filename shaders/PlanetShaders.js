@@ -38,12 +38,13 @@ class PlanetShaders
         out vec2 v_texcoord;
         
         // all shaders have a main function
-        void main() {
-          // Multiply the position by the matrix.
-          gl_Position = u_matrix * a_position;
+        void main() 
+        {
+            // Multiply the position by the matrix.
+            gl_Position = u_matrix * a_position;
         
-          // Pass the texcoord to the fragment shader.
-          v_texcoord = a_texcoord;
+            // Pass the texcoord to the fragment shader.
+            v_texcoord = a_texcoord;
         }
         `;
         
@@ -91,7 +92,7 @@ class PlanetShaders
             if (u_draw_texture)
             {
                 float lon = 2.0 * PI * (v_texcoord.x - 0.5);
-                float lat = PI * (v_texcoord.y - 0.5);
+                float lat = PI * (0.5 - v_texcoord.y);
                 float LSTlon = u_LST + lon;
                 float h = LSTlon - u_rA;
                 float altitude = asin(cos(h)*cos(u_decl)*cos(lat) + sin(u_decl)*sin(lat));
@@ -126,7 +127,7 @@ class PlanetShaders
                 if (u_show_iss)
                 {
                     float longitude = rad2deg(lon);
-                    float latitude = -rad2deg(lat);
+                    float latitude  = rad2deg(lat);
             
                     // Surface coordinates.
                     float sinLat = sin(deg2rad(latitude));
@@ -392,13 +393,13 @@ class PlanetShaders
 
         for (let lonStep = 0; lonStep < this.nLon; lonStep++)
         {
-            const lon = 2 * Math.PI * lonStep / this.nLon;
-            const lonNext = 2 * Math.PI * (lonStep + 1) / this.nLon;
+            const lon = 2 * Math.PI * (lonStep / this.nLon - 0.5);
+            const lonNext = 2 * Math.PI * ((lonStep + 1) / this.nLon - 0.5);
 
             for (let latStep = 0; latStep <= this.nLat-1; latStep++)
             {
-                const lat =  Math.PI * (-0.5 + latStep / this.nLat);
-                const latNext = Math.PI * (-0.5 + (latStep + 1) / this.nLat);
+                const lat =  Math.PI * (latStep / this.nLat - 0.5);
+                const latNext = Math.PI * ((latStep + 1) / this.nLat - 0.5);
                 const indTri = latStep + lonStep * this.nLat;
                 this.insertRectGeo(positions, indTri, lon, lonNext, lat, latNext, 1);
             }  
@@ -424,11 +425,13 @@ class PlanetShaders
      */
     insertRectTex(buffer, indRect, lonStart, lonEnd, latStart, latEnd)
     {
-        const indStart = indRect * 2 * 6;
-        const uLonStart = 1-(lonStart / (2 * Math.PI));
-        const uLonEnd =   1-(lonEnd / (2 * Math.PI));
-        const uLatStart = (latStart) / Math.PI + 0.5;
-        const uLatEnd =  (latEnd) / Math.PI + 0.5;
+        const indStart  = indRect * 2 * 6;
+        const uLonStart = (lonStart / (2 * Math.PI)) + 0.5;
+        const uLonEnd   = (lonEnd / (2 * Math.PI)) + 0.5;
+        const uLatStart = -(latStart) / Math.PI + 0.5;
+        const uLatEnd   = -(latEnd) / Math.PI + 0.5;
+
+        console.log([uLonStart, uLatStart]);
 
         this.insertBufferFloat32(buffer, indStart, 
             [uLonStart, uLatStart, uLonEnd, uLatStart, uLonEnd,   uLatEnd,
@@ -447,13 +450,13 @@ class PlanetShaders
 
         for (let lonStep = 0; lonStep <= this.nLon; lonStep++)
         {
-            const lon = 2 * Math.PI * lonStep / this.nLon;
-            const lonNext = 2 * Math.PI * (lonStep + 1) / this.nLon;
+            const lon = 2 * Math.PI * (lonStep / this.nLon - 0.5);
+            const lonNext = 2 * Math.PI * ((lonStep + 1) / this.nLon - 0.5);
 
             for (let latStep = 0; latStep <= this.nLat; latStep++)
             {
-                const lat =  Math.PI * (-0.5 + latStep / this.nLat);
-                const latNext = Math.PI * (-0.5 + (latStep + 1) / this.nLat);
+                const lat =  Math.PI * (latStep / this.nLat - 0.5);
+                const latNext = Math.PI * ((latStep + 1) / this.nLat - 0.5);
                 const indTri = latStep + lonStep * this.nLat;
 
                 this.insertRectTex(positions, indTri, lon, lonNext, lat, latNext);
@@ -606,24 +609,6 @@ class PlanetShaders
             positions[indStart + 2] = point[2];
         }
         gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
-
-        /*var positions = new Float32Array([
-                // left column front
-                -5,  0,  0,
-                5,  0,  0,
-    
-                0,  -5,  0,
-                0,  5,  0,
-                
-                0,  0,  -5,
-                0,  0,  5,
-        ]);
-
-        this.gridLines = positions.length / 6;
-        console.log(this.gridLines);
-    
-        gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
-        */
     }
 
     // Fill the current ARRAY_BUFFER buffer with colors for the 'F'.
@@ -686,9 +671,8 @@ class PlanetShaders
                 const yEnd = gridCoeff * this.a * MathUtils.cosd(latEnd) * MathUtils.sind(lonEnd);
                 const zEnd = gridCoeff * this.b * MathUtils.sind(latEnd);
 
-                // TODO:
-                points.push([-xStart, yStart, -zStart]);
-                points.push([-xEnd, yEnd, -zEnd]);
+                points.push([xStart, yStart, zStart]);
+                points.push([xEnd, yEnd, zEnd]);
                 nLines++;
             }
         }
