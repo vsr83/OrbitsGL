@@ -431,8 +431,6 @@ class PlanetShaders
         const uLatStart = -(latStart) / Math.PI + 0.5;
         const uLatEnd   = -(latEnd) / Math.PI + 0.5;
 
-        console.log([uLonStart, uLatStart]);
-
         this.insertBufferFloat32(buffer, indStart, 
             [uLonStart, uLatStart, uLonEnd, uLatStart, uLonEnd,   uLatEnd,
              uLonStart, uLatStart, uLonEnd, uLatEnd,   uLonStart, uLatEnd]);
