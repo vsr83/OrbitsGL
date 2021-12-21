@@ -67,6 +67,7 @@ function createControls()
 
         this.lon = 0.0;
         this.lat = 0.0;
+        this.distance = a * 5.0;
 
         this.upLon = 0.0;
         this.upLat = 90.0;
@@ -158,6 +159,7 @@ function createControls()
     cameraFolder.add(guiControls, 'lockLatRot');
     cameraControls.lon = cameraFolder.add(guiControls, 'lon', -180, 180, 0.1);
     cameraControls.lat = cameraFolder.add(guiControls, 'lat', -180, 180, 0.1);
+    cameraControls.distance = cameraFolder.add(guiControls, 'distance', a, 10*a, 100);
     cameraFolder.add(guiControls, 'upLon', -180, 180, 1);
     cameraFolder.add(guiControls, 'upLat', -90, 90, 1);
      

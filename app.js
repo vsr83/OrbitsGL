@@ -11,7 +11,6 @@ var b = 6356.75231414;
 // Camera distance from Earth.
 var distance = 5.0 * a;
 
-
 createControls();
 
 // Delta time (ms) from configuration of date and time.
@@ -77,6 +76,44 @@ canvas.addEventListener("mouseleave", function(e) {
 
 document.addEventListener("wheel", function(e) {
     distance *= (e.deltaY * 0.0001 + 1);
+    cameraControls.distance.setValue(distance);
+});
+
+function touchMove(e)
+{
+    const m = e.touches[0];
+    console.log(m.clientX + " " + m.clientY);
+
+    dragX = dragXStart - (m.clientX - xStart) / 10.0;
+    dragY = dragYStart - (m.clientY - yStart) / 10.0;
+
+    if (dragX > 270.0) dragX -= 360.0;
+    if (dragY > 180.0) dragY -= 360.0;
+    if (dragX < -90.0) dragX += 360.0;
+    if (dragY < -180.0) dragY += 360.0;
+
+    rotZ = MathUtils.deg2Rad(-dragX);
+    rotX = MathUtils.deg2Rad(-90 - dragY);
+    
+    cameraControls.lon.setValue(rotZToLon(MathUtils.rad2Deg(rotZ)));
+    cameraControls.lat.setValue(rotXToLat(MathUtils.rad2Deg(rotX)));
+}
+
+document.addEventListener("touchstart", function(e) {
+    if (e.touches.length == 1)
+    {
+        xStart = e.touches[0].clientX;
+        yStart = e.touches[0].clientY;
+        dragXStart = -MathUtils.rad2Deg(rotZ);
+        dragYStart = -MathUtils.rad2Deg(rotX) - 90;
+        console.log(xStart + " " + yStart);
+
+        document.addEventListener("touchmove", touchMove, { passive: false });
+    }
+}, { passive: false });
+
+document.addEventListener("touchend", function(e) {
+    document.removeEventListener("touchmove", touchMove);
 });
 
 gl = canvas.getContext("webgl2");
@@ -265,6 +302,8 @@ function drawScene(time)
     var zFar = a * 100.0;
     var projectionMatrix = m4.perspective(fieldOfViewRadians, aspect, zNear, zFar);
     
+
+    distance = cameraControls.distance.getValue();
     // Camera position in the clip space.
     var cameraPosition = [0, 0, distance];
     var up = [0, 1, 0];
