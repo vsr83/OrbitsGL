@@ -61,7 +61,7 @@ function createControls()
         };
         this.warpSeconds = 60;
         this.timeWarp = false;
-        this.lockLonRot = true;
+        this.lockLonRot = false;
         this.lockLatRot = false;
         this.upLon = 0.0;
         this.upLat = 90.0;
