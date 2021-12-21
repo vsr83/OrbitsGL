@@ -26,6 +26,8 @@ function createControls()
         this.gridLatResolution = 30;        
         this.enableSun = true;
         this.enableMoon = true;
+        this.enableSubSolar = false;
+
         //this.enableLocation = false;
         this.displayTwilight = true;
         this.deltaDays = 0;
@@ -61,6 +63,8 @@ function createControls()
         this.timeWarp = false;
         this.lockLonRot = true;
         this.lockLatRot = false;
+        this.upLon = 0.0;
+        this.upLat = 90.0;
         this.fov = 30;
         
         this.enableTelemetry = true;
@@ -135,6 +139,7 @@ function createControls()
     displayFolder.add(guiControls, 'enableMap').onChange(requestFrame);
     displayFolder.add(guiControls, 'enableTextures').onChange(requestFrame);
     displayFolder.add(guiControls, 'enableVisibility').onChange(requestFrame);
+    displayFolder.add(guiControls, 'enableSubSolar').onChange(requestFrame);
  
     const cameraFolder = gui.addFolder('Camera');
  
@@ -149,6 +154,8 @@ function createControls()
     cameraFolder.add(guiControls, 'fov', 1, 180, 1).onChange(requestFrame());
     cameraFolder.add(guiControls, 'lockLonRot').onChange(requestFrame());
     cameraFolder.add(guiControls, 'lockLatRot').onChange(requestFrame());
+    cameraFolder.add(guiControls, 'upLon', -180, 180, 1).onChange(requestFrame());
+    cameraFolder.add(guiControls, 'upLat', -90, 90, 1).onChange(requestFrame());
      
     const timeFolder = gui.addFolder('Time');
     timeControls.warpSeconds = timeFolder.add(guiControls, 'warpSeconds', -60, 60, 1).onChange(configureTime); 

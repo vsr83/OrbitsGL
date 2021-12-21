@@ -272,6 +272,10 @@ function drawScene(time)
     // Camera position in the clip space.
     var cameraPosition = [0, 0, distance];
     var up = [0, 1, 0];
+    up[0] = MathUtils.cosd(guiControls.upLat) * MathUtils.cosd(guiControls.upLon);
+    up[2] = MathUtils.cosd(guiControls.upLat) * MathUtils.sind(guiControls.upLon);
+    up[1] = MathUtils.sind(guiControls.upLat);
+
     var target = [0, 0, 0];
 
     // Compute the camera's matrix using look at.
@@ -369,6 +373,24 @@ function drawScene(time)
         earthShaders.draw(sunMatrix, rASun, declSun, LST, false, false, false, null);
 
         let pSun = [];
+        if (guiControls.enableSubSolar)
+        {
+            for (let lonDelta = 0; lonDelta < 361.0; lonDelta++)
+            {
+                const xSun = a * MathUtils.cosd(lonlat.lat) * MathUtils.cosd(lonlat.lon + lonDelta);
+                const ySun = a * MathUtils.cosd(lonlat.lat) * MathUtils.sind(lonlat.lon + lonDelta);
+                const zSun = b * MathUtils.sind(lonlat.lat);  
+                
+                pSun.push([xSun, ySun, zSun]);
+                if (lonDelta != 0.0)
+                {
+                    pSun.push([xSun, ySun, zSun]);
+                }
+            }
+            pSun.push(pSun[pSun.length - 1]);
+            pSun.push([0, 0, 0]);
+            pSun.push([xSun, ySun, zSun]);
+        }
         for (let lonDelta = 0; lonDelta < 361.0; lonDelta++)
         {
             const xSun = D * MathUtils.cosd(lonlat.lat) * MathUtils.cosd(lonlat.lon + lonDelta);
@@ -382,6 +404,7 @@ function drawScene(time)
             }
         }
         pSun.push(pSun[pSun.length - 1]);
+
         lineShaders.setGeometry(pSun);
         lineShaders.draw(matrix);
     }
