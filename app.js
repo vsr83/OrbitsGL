@@ -46,8 +46,6 @@ canvas.addEventListener("mousedown", function(e) {
     dragXStart = -MathUtils.rad2Deg(rotZ);
     dragYStart = -MathUtils.rad2Deg(rotX) - 90;
 
-    console.log("xStart " + xStart);
-
     canvas.onmousemove = function(m) {
         //console.log(m);
         dragX = dragXStart - (m.clientX - xStart) / 10.0;
@@ -81,8 +79,19 @@ document.addEventListener("wheel", function(e) {
 
 function touchMove(e)
 {
+    if (scaling)
+    {
+        const dist = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, 
+        e.touches[0].pageY - e.touches[1].pageY);
+
+        distance = distanceStart * (0.001 * (zoomStart - dist) + 1);
+        cameraControls.distance.setValue(distance);
+        e.preventDefault();
+
+        return;
+    }
+
     const m = e.touches[0];
-    console.log(m.clientX + " " + m.clientY);
 
     dragX = dragXStart - (m.clientX - xStart) / 10.0;
     dragY = dragYStart - (m.clientY - yStart) / 10.0;
@@ -99,6 +108,9 @@ function touchMove(e)
     cameraControls.lat.setValue(rotXToLat(MathUtils.rad2Deg(rotX)));
 }
 
+var scaling = false;
+var zoomStart = 0;
+var distanceStart = 0;
 document.addEventListener("touchstart", function(e) {
     if (e.touches.length == 1)
     {
@@ -106,14 +118,22 @@ document.addEventListener("touchstart", function(e) {
         yStart = e.touches[0].clientY;
         dragXStart = -MathUtils.rad2Deg(rotZ);
         dragYStart = -MathUtils.rad2Deg(rotX) - 90;
-        console.log(xStart + " " + yStart);
 
         document.addEventListener("touchmove", touchMove, { passive: false });
+    }
+    if (e.touches.length == 2)
+    {
+        distanceStart = distance;
+        zoomStart = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, 
+            e.touches[0].pageY - e.touches[1].pageY);
+        scaling = true;
+        e.preventDefault();
     }
 }, { passive: false });
 
 document.addEventListener("touchend", function(e) {
     document.removeEventListener("touchmove", touchMove);
+    scaling = false;
 });
 
 gl = canvas.getContext("webgl2");
