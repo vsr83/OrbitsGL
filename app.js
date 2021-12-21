@@ -20,6 +20,9 @@ var dateDelta = 0;
 // Field of view.
 var fieldOfViewRadians = MathUtils.deg2Rad(30);
 
+let rotZToLon = (rotZ) => {return (-90 - rotZ);}
+let rotXToLat = (rotX) => {return (90 + rotX);}
+
 // Rotation.
 var rotX = MathUtils.deg2Rad(-90);
 var rotY = MathUtils.deg2Rad(0);
@@ -41,18 +44,26 @@ var canvas = document.querySelector("#canvas");
 canvas.addEventListener("mousedown", function(e) {
     xStart = e.clientX;
     yStart = e.clientY;
-    dragXStart = -rotZ;
-    dragYStart = -rotX - 90;
+    dragXStart = -MathUtils.rad2Deg(rotZ);
+    dragYStart = -MathUtils.rad2Deg(rotX) - 90;
 
     console.log("xStart " + xStart);
 
     canvas.onmousemove = function(m) {
         //console.log(m);
-        dragX = dragXStart - (m.clientX - xStart) / 100.0;
-        dragY = dragYStart - (m.clientY - yStart) / 100.0;
+        dragX = dragXStart - (m.clientX - xStart) / 10.0;
+        dragY = dragYStart - (m.clientY - yStart) / 10.0;
 
-        rotZ = -dragX;
-        rotX = -90 - dragY;
+        if (dragX > 270.0) dragX -= 360.0;
+        if (dragY > 180.0) dragY -= 360.0;
+        if (dragX < -90.0) dragX += 360.0;
+        if (dragY < -180.0) dragY += 360.0;
+
+        rotZ = MathUtils.deg2Rad(-dragX);
+        rotX = MathUtils.deg2Rad(-90 - dragY);
+        
+        cameraControls.lon.setValue(rotZToLon(MathUtils.rad2Deg(rotZ)));
+        cameraControls.lat.setValue(rotXToLat(MathUtils.rad2Deg(rotX)));
     }
 });
 
@@ -274,10 +285,20 @@ function drawScene(time)
     if (guiControls.lockLonRot)
     {
         rotZ = MathUtils.deg2Rad(-90 - ISS.lon);
+        cameraControls.lon.setValue(ISS.lon);
+    }
+    else if (canvas.onmousemove == null)
+    {
+        rotZ = MathUtils.deg2Rad(-90 - guiControls.lon);
     }
     if (guiControls.lockLatRot)
     {
         rotX = MathUtils.deg2Rad(-90 + ISS.lat);
+        cameraControls.lat.setValue(ISS.lat);
+    }
+    else if (canvas.onmousemove == null)
+    {
+        rotX = MathUtils.deg2Rad(-90 + guiControls.lat);
     }
 
     var matrix = m4.xRotate(viewProjectionMatrix, rotX);

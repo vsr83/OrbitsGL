@@ -4,6 +4,7 @@ var guiControls = null;
 // Hold OSV controls.
 var osvControls = {};
 var timeControls = {};
+var cameraControls = {};
 
 /**
  * Create GUI controls.
@@ -63,6 +64,10 @@ function createControls()
         this.timeWarp = false;
         this.lockLonRot = false;
         this.lockLatRot = false;
+
+        this.lon = 0.0;
+        this.lat = 0.0;
+
         this.upLon = 0.0;
         this.upLat = 90.0;
         this.fov = 30;
@@ -140,17 +145,19 @@ function createControls()
     displayFolder.add(guiControls, 'enableTextures');
     displayFolder.add(guiControls, 'enableVisibility');
     displayFolder.add(guiControls, 'enableSubSolar');
- 
-    const cameraFolder = gui.addFolder('Camera');
     const lonControl = displayFolder.add(guiControls, 'gridLonResolution', 1, 180, 1);
     const latControl = displayFolder.add(guiControls, 'gridLatResolution', 1, 180, 1);
     displayFolder.add(guiControls, 'enableOrbit');
     displayFolder.add(guiControls, 'enableSun');
     displayFolder.add(guiControls, 'enableMoon');
+ 
+    const cameraFolder = gui.addFolder('Camera');
     //displayFolder.add(guiControls, 'enableLocation');
     cameraFolder.add(guiControls, 'fov', 1, 180, 1);
     cameraFolder.add(guiControls, 'lockLonRot');
     cameraFolder.add(guiControls, 'lockLatRot');
+    cameraControls.lon = cameraFolder.add(guiControls, 'lon', -180, 180, 0.1);
+    cameraControls.lat = cameraFolder.add(guiControls, 'lat', -180, 180, 0.1);
     cameraFolder.add(guiControls, 'upLon', -180, 180, 1);
     cameraFolder.add(guiControls, 'upLat', -90, 90, 1);
      
