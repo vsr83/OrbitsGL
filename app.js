@@ -80,21 +80,6 @@ lineShaders = new LineShaders(gl);
 lineShaders.init();
 
 requestAnimationFrame(drawScene);
-/**
- * Request frame if no drawing is on-going.
- */
- function requestFrame() 
- {
-     // If drawing is on-going, skip. This is an attempt to avoid the situation, where 
-     // drawing requests accumulate faster than can be processed due to UI callbacks.
-     /*if (drawing)
-     {
-         return;
-     }
- 
-     drawing = true;
-     requestAnimationFrame(drawScene);*/
- }
  
 
 // Draw the scene.

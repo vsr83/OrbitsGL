@@ -135,31 +135,28 @@ function createControls()
  
     gui = new dat.GUI();
     const displayFolder = gui.addFolder('Display');
-    displayFolder.add(guiControls, 'enableGrid').onChange(requestFrame);
-    displayFolder.add(guiControls, 'enableMap').onChange(requestFrame);
-    displayFolder.add(guiControls, 'enableTextures').onChange(requestFrame);
-    displayFolder.add(guiControls, 'enableVisibility').onChange(requestFrame);
-    displayFolder.add(guiControls, 'enableSubSolar').onChange(requestFrame);
+    displayFolder.add(guiControls, 'enableGrid');
+    displayFolder.add(guiControls, 'enableMap');
+    displayFolder.add(guiControls, 'enableTextures');
+    displayFolder.add(guiControls, 'enableVisibility');
+    displayFolder.add(guiControls, 'enableSubSolar');
  
     const cameraFolder = gui.addFolder('Camera');
- 
- 
- 
-    const lonControl = displayFolder.add(guiControls, 'gridLonResolution', 1, 180, 1).onChange(requestFrame);
-    const latControl = displayFolder.add(guiControls, 'gridLatResolution', 1, 180, 1).onChange(requestFrame);
-    displayFolder.add(guiControls, 'enableOrbit').onChange(requestFrame());
-    displayFolder.add(guiControls, 'enableSun').onChange(requestFrame());
-    displayFolder.add(guiControls, 'enableMoon').onChange(requestFrame());
-    //displayFolder.add(guiControls, 'enableLocation').onChange(requestFrame());
-    cameraFolder.add(guiControls, 'fov', 1, 180, 1).onChange(requestFrame());
-    cameraFolder.add(guiControls, 'lockLonRot').onChange(requestFrame());
-    cameraFolder.add(guiControls, 'lockLatRot').onChange(requestFrame());
-    cameraFolder.add(guiControls, 'upLon', -180, 180, 1).onChange(requestFrame());
-    cameraFolder.add(guiControls, 'upLat', -90, 90, 1).onChange(requestFrame());
+    const lonControl = displayFolder.add(guiControls, 'gridLonResolution', 1, 180, 1);
+    const latControl = displayFolder.add(guiControls, 'gridLatResolution', 1, 180, 1);
+    displayFolder.add(guiControls, 'enableOrbit');
+    displayFolder.add(guiControls, 'enableSun');
+    displayFolder.add(guiControls, 'enableMoon');
+    //displayFolder.add(guiControls, 'enableLocation');
+    cameraFolder.add(guiControls, 'fov', 1, 180, 1);
+    cameraFolder.add(guiControls, 'lockLonRot');
+    cameraFolder.add(guiControls, 'lockLatRot');
+    cameraFolder.add(guiControls, 'upLon', -180, 180, 1);
+    cameraFolder.add(guiControls, 'upLat', -90, 90, 1);
      
     const timeFolder = gui.addFolder('Time');
     timeControls.warpSeconds = timeFolder.add(guiControls, 'warpSeconds', -60, 60, 1).onChange(configureTime); 
-    timeFolder.add(guiControls, 'timeWarp').onChange(requestFrame);
+    timeFolder.add(guiControls, 'timeWarp');
     timeControls.yearControl = timeFolder.add(guiControls, 'dateYear', 1980, 2040, 1).onChange(configureTime);
     timeControls.monthControl = timeFolder.add(guiControls, 'dateMonth', 1, 12, 1).onChange(configureTime);
     timeControls.dayControl = timeFolder.add(guiControls, 'dateDay', 1, 31, 1).onChange(configureTime);
@@ -167,10 +164,10 @@ function createControls()
     timeControls.minuteControl = timeFolder.add(guiControls, 'timeMinute', 0, 59, 1).onChange(configureTime);
     timeControls.secondControl = timeFolder.add(guiControls, 'timeSecond', 0, 59, 1).onChange(configureTime);
  
-    timeControls.deltaDayControl = timeFolder.add(guiControls, 'deltaDays', -185, 185, 1).onChange(requestFrame);
-    timeControls.deltaHourControl = timeFolder.add(guiControls, 'deltaHours', -12, 12, 1).onChange(requestFrame);
-    timeControls.deltaMinuteControl = timeFolder.add(guiControls, 'deltaMins', -30, 30, 1).onChange(requestFrame);
-    timeControls.deltaSecControl = timeFolder.add(guiControls, 'deltaSecs', -30, 30, 1).onChange(requestFrame);
+    timeControls.deltaDayControl = timeFolder.add(guiControls, 'deltaDays', -185, 185, 1);
+    timeControls.deltaHourControl = timeFolder.add(guiControls, 'deltaHours', -12, 12, 1);
+    timeControls.deltaMinuteControl = timeFolder.add(guiControls, 'deltaMins', -30, 30, 1);
+    timeControls.deltaSecControl = timeFolder.add(guiControls, 'deltaSecs', -30, 30, 1);
     timeFolder.add({reset:function()
         {
             var resetDate = new Date();
@@ -186,27 +183,25 @@ function createControls()
             timeControls.secondControl.setValue(resetDate.getSeconds());
 
             dateDelta = 0;
-    
-            requestFrame();
-        }}, 'reset');
+    }}, 'reset');
      
     const textFolder = gui.addFolder('Caption');
-    textFolder.add(guiControls, 'showLocal').onChange(requestFrame);
-    textFolder.add(guiControls, 'showUtc').onChange(requestFrame);
-    textFolder.add(guiControls, 'showJulian').onChange(requestFrame);
-    textFolder.add(guiControls, 'showSunRa').onChange(requestFrame);
-    textFolder.add(guiControls, 'showSunDecl').onChange(requestFrame);
-    textFolder.add(guiControls, 'showSunLongitude').onChange(requestFrame);
-    textFolder.add(guiControls, 'showSunLatitude').onChange(requestFrame);
-    textFolder.add(guiControls, 'showMoonRa').onChange(requestFrame);
-    textFolder.add(guiControls, 'showMoonDecl').onChange(requestFrame);
-    textFolder.add(guiControls, 'showMoonLongitude').onChange(requestFrame);
-    textFolder.add(guiControls, 'showMoonLatitude').onChange(requestFrame);
-    textFolder.add(guiControls, 'showTelemetry').onChange(requestFrame);
-    textFolder.add(guiControls, 'showOsvGM2000').onChange(requestFrame);
-    textFolder.add(guiControls, 'showOsvECEF').onChange(requestFrame);
-    textFolder.add(guiControls, 'showIssLocation').onChange(requestFrame);
-    textFolder.add(guiControls, 'showIssElements').onChange(requestFrame);
+    textFolder.add(guiControls, 'showLocal');
+    textFolder.add(guiControls, 'showUtc');
+    textFolder.add(guiControls, 'showJulian');
+    textFolder.add(guiControls, 'showSunRa');
+    textFolder.add(guiControls, 'showSunDecl');
+    textFolder.add(guiControls, 'showSunLongitude');
+    textFolder.add(guiControls, 'showSunLatitude');
+    textFolder.add(guiControls, 'showMoonRa');
+    textFolder.add(guiControls, 'showMoonDecl');
+    textFolder.add(guiControls, 'showMoonLongitude');
+    textFolder.add(guiControls, 'showMoonLatitude');
+    textFolder.add(guiControls, 'showTelemetry');
+    textFolder.add(guiControls, 'showOsvGM2000');
+    textFolder.add(guiControls, 'showOsvECEF');
+    textFolder.add(guiControls, 'showIssLocation');
+    textFolder.add(guiControls, 'showIssElements');
  
 
 
@@ -225,19 +220,19 @@ function createControls()
             osvControls.enableTelemetry.setValue(0);
         }
     });
-    osvControls.enableClock = dataFolder.add(guiControls, 'enableClock').onChange(requestFrame);
-    osvControls.osvYear = dataFolder.add(guiControls, 'osvYear', 1980, 2040, 1).onChange(requestFrame);
-    osvControls.osvMonth = dataFolder.add(guiControls, 'osvMonth', 1, 12, 1).onChange(requestFrame);
-    osvControls.osvDay = dataFolder.add(guiControls, 'osvDay', 1, 31, 1).onChange(requestFrame);
-    osvControls.osvHour = dataFolder.add(guiControls, 'osvHour', 0, 23, 1).onChange(requestFrame);
-    osvControls.osvMinute = dataFolder.add(guiControls, 'osvMinute', 0, 59, 1).onChange(requestFrame);
-    osvControls.osvSecond = dataFolder.add(guiControls, 'osvSecond', 0, 59, 1).onChange(requestFrame);
-    osvControls.osvX = dataFolder.add(guiControls, 'osvX', -10000, 10000, 0.000001).onChange(requestFrame);
-    osvControls.osvY = dataFolder.add(guiControls, 'osvY', -10000, 10000, 0.000001).onChange(requestFrame);
-    osvControls.osvZ = dataFolder.add(guiControls, 'osvZ', -10000, 10000, 0.000001).onChange(requestFrame);
-    osvControls.osvVx = dataFolder.add(guiControls, 'osvVx', -10000, 10000, 0.000001).onChange(requestFrame);
-    osvControls.osvVy = dataFolder.add(guiControls, 'osvVy', -10000, 10000, 0.000001).onChange(requestFrame);
-    osvControls.osvVz = dataFolder.add(guiControls, 'osvVz', -10000, 10000, 0.000001).onChange(requestFrame);
+    osvControls.enableClock = dataFolder.add(guiControls, 'enableClock');
+    osvControls.osvYear = dataFolder.add(guiControls, 'osvYear', 1980, 2040, 1);
+    osvControls.osvMonth = dataFolder.add(guiControls, 'osvMonth', 1, 12, 1);
+    osvControls.osvDay = dataFolder.add(guiControls, 'osvDay', 1, 31, 1);
+    osvControls.osvHour = dataFolder.add(guiControls, 'osvHour', 0, 23, 1);
+    osvControls.osvMinute = dataFolder.add(guiControls, 'osvMinute', 0, 59, 1);
+    osvControls.osvSecond = dataFolder.add(guiControls, 'osvSecond', 0, 59, 1);
+    osvControls.osvX = dataFolder.add(guiControls, 'osvX', -10000, 10000, 0.000001);
+    osvControls.osvY = dataFolder.add(guiControls, 'osvY', -10000, 10000, 0.000001);
+    osvControls.osvZ = dataFolder.add(guiControls, 'osvZ', -10000, 10000, 0.000001);
+    osvControls.osvVx = dataFolder.add(guiControls, 'osvVx', -10000, 10000, 0.000001);
+    osvControls.osvVy = dataFolder.add(guiControls, 'osvVy', -10000, 10000, 0.000001);
+    osvControls.osvVz = dataFolder.add(guiControls, 'osvVz', -10000, 10000, 0.000001);
     osvControls.osvInputString = dataFolder.add(guiControls, 'osvInputString');
  
     dataFolder.add({setClockFromOsv:function()
