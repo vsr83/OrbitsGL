@@ -153,6 +153,12 @@ requestAnimationFrame(drawScene);
 // Draw the scene.
 function drawScene(time) 
 {
+    if (earthShaders.numTextures < 2)
+    {
+        requestAnimationFrame(drawScene);
+        return;
+    }
+
     ISS.osv = ISS.osvIn;
 
     canvas.width = document.documentElement.clientWidth;
