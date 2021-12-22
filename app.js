@@ -412,7 +412,6 @@ function drawScene(time)
             p.push([x, y, z]);
         }
     }
-    console.log(p.length);
     p.push(p[p.length - 1]);
     p.push([ISS.x, ISS.y, ISS.z]);
     p.push([0, 0, 0]);
