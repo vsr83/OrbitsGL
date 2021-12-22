@@ -12,6 +12,7 @@ class LineShaders
     constructor(gl)
     {
         this.gl = gl;
+        this.colorOrbit = [127, 127, 127];
 
         this.vertShaderLine = `#version 300 es
             // an attribute is an input (in) to a vertex shader.
@@ -139,9 +140,9 @@ class LineShaders
         for (let indPoint = 0; indPoint < this.gridLines * 2; indPoint++)
         {
             const startIndex = indPoint * 3;
-            colorArray[startIndex] = 127;
-            colorArray[startIndex + 1] = 127;
-            colorArray[startIndex + 2] = 127;
+            colorArray[startIndex] = this.colorOrbit[0];
+            colorArray[startIndex + 1] = this.colorOrbit[1];
+            colorArray[startIndex + 2] = this.colorOrbit[2];
         }
         gl.bindBuffer(gl.ARRAY_BUFFER, this.colorBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, colorArray, gl.STATIC_DRAW);

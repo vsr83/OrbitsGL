@@ -30,6 +30,9 @@ function createControls()
         this.gridLatResolution = 30;        
         this.orbitsBefore = 1.0;
         this.orbitsAfter = 1.0;
+        this.colorGrid = [80, 80, 80];
+        this.colorMap = [80, 80, 120];
+        this.colorOrbit = [127, 127, 127];
 
         //this.enableLocation = false;
         this.displayTwilight = true;
@@ -163,6 +166,23 @@ function createControls()
     });
     displayFolder.add(guiControls, 'orbitsBefore', 0, 5, 0.1);
     displayFolder.add(guiControls, 'orbitsAfter', 0, 5, 0.1);
+    displayFolder.addColor(guiControls, 'colorGrid')
+    .onChange(function()
+    {
+        earthShaders.colorGrid = guiControls.colorGrid;
+        earthShaders.setColorsGrid();
+    });
+    displayFolder.addColor(guiControls, 'colorMap')
+    .onChange(function()
+    {
+        earthShaders.colorMap = guiControls.colorMap;
+        earthShaders.setColorsMap();
+    });
+    displayFolder.addColor(guiControls, 'colorOrbit')
+    .onChange(function()
+    {
+        lineShaders.colorOrbit = guiControls.colorOrbit;
+    });
  
     const cameraFolder = gui.addFolder('Camera');
     //displayFolder.add(guiControls, 'enableLocation');

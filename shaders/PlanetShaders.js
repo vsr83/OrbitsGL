@@ -31,6 +31,9 @@ class PlanetShaders
         this.lonGridStep = lonGridStep;
         this.latGridStep = latGridStep;
 
+        this.colorGrid = [80, 80, 80];
+        this.colorMap = [80, 80, 127];
+
         this.vertShaderSphere = `#version 300 es
         // an attribute is an input (in) to a vertex shader.
         // It will receive data from a buffer
@@ -646,9 +649,9 @@ class PlanetShaders
         for (let indPoint = 0; indPoint < this.gridLinesMap * 2; indPoint++)
         {
             const startIndex = indPoint * 3;
-            colorArray[startIndex] = 80;
-            colorArray[startIndex + 1] = 80;
-            colorArray[startIndex + 2] = 120;
+            colorArray[startIndex] = this.colorMap[0];
+            colorArray[startIndex + 1] = this.colorMap[1];
+            colorArray[startIndex + 2] = this.colorMap[2];
         }
         gl.bindBuffer(gl.ARRAY_BUFFER, this.colorBufferMap);
         gl.bufferData(gl.ARRAY_BUFFER, colorArray, gl.STATIC_DRAW);
@@ -663,9 +666,9 @@ class PlanetShaders
         for (let indPoint = 0; indPoint < this.gridLines * 2; indPoint++)
         {
             const startIndex = indPoint * 3;
-            colorArray[startIndex] = 80;
-            colorArray[startIndex + 1] = 80;
-            colorArray[startIndex + 2] = 80;
+            colorArray[startIndex] = this.colorGrid[0];
+            colorArray[startIndex + 1] = this.colorGrid[1];
+            colorArray[startIndex + 2] = this.colorGrid[2];
         }
         gl.bindBuffer(gl.ARRAY_BUFFER, this.colorBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, colorArray, gl.STATIC_DRAW);
