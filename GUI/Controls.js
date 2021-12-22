@@ -21,13 +21,15 @@ function createControls()
         this.enableMap = true;
         this.enableVisibility = true;
         this.enableTextures = true;
+        this.enableSun = true;
+        this.enableMoon = true;
+        this.enableSubSolar = false;
         this.locationLon = 24.66;
         this.locationLat = 60.21;
         this.gridLonResolution = 30;
         this.gridLatResolution = 30;        
-        this.enableSun = true;
-        this.enableMoon = true;
-        this.enableSubSolar = false;
+        this.orbitsBefore = 1.0;
+        this.orbitsAfter = 1.0;
 
         //this.enableLocation = false;
         this.displayTwilight = true;
@@ -146,6 +148,9 @@ function createControls()
     displayFolder.add(guiControls, 'enableTextures');
     displayFolder.add(guiControls, 'enableVisibility');
     displayFolder.add(guiControls, 'enableSubSolar');
+    displayFolder.add(guiControls, 'enableOrbit');
+    displayFolder.add(guiControls, 'enableSun');
+    displayFolder.add(guiControls, 'enableMoon');
     const lonControl = displayFolder.add(guiControls, 'gridLonResolution', 1, 180, 1)
     .onChange(function()
     {
@@ -156,9 +161,8 @@ function createControls()
     {
         earthShaders.updateGrid(guiControls.gridLonResolution, guiControls.gridLatResolution);
     });
-    displayFolder.add(guiControls, 'enableOrbit');
-    displayFolder.add(guiControls, 'enableSun');
-    displayFolder.add(guiControls, 'enableMoon');
+    displayFolder.add(guiControls, 'orbitsBefore', 0, 5, 0.1);
+    displayFolder.add(guiControls, 'orbitsAfter', 0, 5, 0.1);
  
     const cameraFolder = gui.addFolder('Camera');
     //displayFolder.add(guiControls, 'enableLocation');

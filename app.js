@@ -391,7 +391,8 @@ function drawScene(time)
     const jdStep = period / 100.01;
 
     // Draw orbit.
-    for (let jdDelta = -period; jdDelta <= period; jdDelta += jdStep)
+    for (let jdDelta = -period * guiControls.orbitsBefore; jdDelta <= period * guiControls.orbitsAfter; 
+        jdDelta += jdStep)
     {
         const deltaDate = new Date(today.getTime() +  1000 * jdDelta);
         const osvProp = Kepler.propagate(kepler_updated, deltaDate);
@@ -406,11 +407,12 @@ function drawScene(time)
         const z = alt * 0.001 * MathUtils.sind(lat);
 
         p.push([x, y, z]);
-        if (jdDelta != -period)
+        if (p.length != 1)
         {
             p.push([x, y, z]);
         }
     }
+    console.log(p.length);
     p.push(p[p.length - 1]);
     p.push([ISS.x, ISS.y, ISS.z]);
     p.push([0, 0, 0]);
