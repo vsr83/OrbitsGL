@@ -138,7 +138,7 @@ function createControls()
         const today = new Date().getTime();
         dateDelta = newDate - today;
     }
- 
+
     gui = new dat.GUI();
     const displayFolder = gui.addFolder('Display');
     displayFolder.add(guiControls, 'enableGrid');
@@ -146,8 +146,16 @@ function createControls()
     displayFolder.add(guiControls, 'enableTextures');
     displayFolder.add(guiControls, 'enableVisibility');
     displayFolder.add(guiControls, 'enableSubSolar');
-    const lonControl = displayFolder.add(guiControls, 'gridLonResolution', 1, 180, 1);
-    const latControl = displayFolder.add(guiControls, 'gridLatResolution', 1, 180, 1);
+    const lonControl = displayFolder.add(guiControls, 'gridLonResolution', 1, 180, 1)
+    .onChange(function()
+    {
+        earthShaders.updateGrid(guiControls.gridLonResolution, guiControls.gridLatResolution);
+    });
+    const latControl = displayFolder.add(guiControls, 'gridLatResolution', 1, 180, 1)
+    .onChange(function()
+    {
+        earthShaders.updateGrid(guiControls.gridLonResolution, guiControls.gridLatResolution);
+    });
     displayFolder.add(guiControls, 'enableOrbit');
     displayFolder.add(guiControls, 'enableSun');
     displayFolder.add(guiControls, 'enableMoon');

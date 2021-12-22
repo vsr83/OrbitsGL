@@ -16,14 +16,20 @@ class PlanetShaders
      *      Equatorial radius.
      * @param {*} b
      *      Polar radius.
+     * @param {*} lonGridStep
+     *      Longitude grid step.
+     * @param {*} latGridStep
+     *      Latitude grid step.
      */
-    constructor(gl, nLon, nLat, a, b)
+    constructor(gl, nLon, nLat, a, b, lonGridStep, latGridStep)
     {
         this.gl = gl;
         this.a = a;
         this.b = b;
         this.nLat = nLat;
         this.nLon = nLon;
+        this.lonGridStep = lonGridStep;
+        this.latGridStep = latGridStep;
 
         this.vertShaderSphere = `#version 300 es
         // an attribute is an input (in) to a vertex shader.
@@ -557,12 +563,13 @@ class PlanetShaders
         let gl = this.gl;
         const points = [];
         let lonStep = 2.0;
-        let latStep = 15.0;
+        let latStep = this.latGridStep;
         let nLines = 0;
 
         let gridCoeff = 1.002;
+        const nStepLat = Math.floor(90.0 / latStep);
 
-        for (let lat = -90.0; lat < 90.0; lat += latStep)
+        for (let lat = -nStepLat * latStep; lat <= nStepLat * latStep; lat += latStep)
         {
             for (let lon = -180.0; lon < 180.0; lon += lonStep)
             {
@@ -578,8 +585,10 @@ class PlanetShaders
             }
         }
         latStep = 2.0;
-        lonStep = 15.0;
-        for (let lon = -180.0; lon < 180.0; lon += lonStep)
+        lonStep = this.lonGridStep;
+        const nStepLon = Math.floor(180.0 / lonStep);
+
+        for (let lon = -nStepLon * lonStep; lon <= nStepLon * lonStep; lon += lonStep)
         {
             for (let lat = -90.0; lat < 90.0; lat += latStep)
             {
@@ -607,6 +616,25 @@ class PlanetShaders
             positions[indStart + 2] = point[2];
         }
         gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
+    }
+
+    /**
+     * Update grid resolution.
+     * 
+     * @param {*} lonRes
+     *      Longitude resolution in degrees. 
+     * @param {*} latRes 
+     *      Latitude resolution in degrees.
+     */
+    updateGrid(lonRes, latRes)
+    {
+        this.lonGridStep = lonRes;
+        this.latGridStep = latRes;
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBufferGrid);
+        this.setGeometryGrid();
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.colorBuffer);
+        this.setColorsGrid();
     }
 
     // Fill the current ARRAY_BUFFER buffer with colors for the 'F'.

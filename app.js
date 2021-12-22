@@ -141,7 +141,7 @@ if (!gl)
 {
     console.log("Failed to initialize GL.");
 }
-earthShaders = new PlanetShaders(gl, 50, 50, a, b);
+earthShaders = new PlanetShaders(gl, 50, 50, a, b, 15, 15);
 earthShaders.init("textures/8k_earth_daymap.jpg", "textures/8k_earth_nightmap.jpg");
 
 lineShaders = new LineShaders(gl);
