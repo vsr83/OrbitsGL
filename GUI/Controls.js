@@ -40,6 +40,7 @@ function createControls()
         this.deltaHours = 0;
         this.deltaMins = 0;
         this.deltaSecs = 0;
+        this.showTargetName = true;
         this.showLocal = false;
         this.showUtc = false;
         this.showJulian = false;
@@ -80,7 +81,9 @@ function createControls()
         
         this.enableTelemetry = true;
         this.enableOEM = false;
+        this.enableTLE = false;
         this.enableClock = true;
+        this.targetName = "ISS (ZARYA)";
         this.osvYear = 2021;
         this.osvMonth = 11;
         this.osvDay = 22;
@@ -95,6 +98,8 @@ function createControls()
         this.osvVz = 0.0;
         this.osvInputString = function() {
             osvControls.enableTelemetry.setValue(0);
+            osvControls.enableOEM.setValue(0);
+            osvControls.enableTLE.setValue(0);
             var osvIn = prompt("Orbit State Vector", 
             "2021-12-05T18:10:00.000 5326.946850262350 4182.210271432980 -611.867277305457 -3.37162589413797 3.42675425977118 -5.96208196793267");
             if (osvIn != null) 
@@ -129,6 +134,21 @@ function createControls()
                 osvControls.osvVy.setValue(velY * 1000);
                 osvControls.osvVz.setValue(velZ * 1000);
             }
+        }
+        this.tleInputString = function() {
+            osvControls.enableTelemetry.setValue(0);
+            var tleIn = prompt("Two-Line Element",  "Paste three lines here.");
+            if (tleIn != null) 
+            {
+                const lines = tleIn.split('\n');
+                console.log(lines);
+                osvControls.targetName.setValue(lines[0]);
+                satrec = satellite.twoline2satrec(lines[1], lines[2]);
+            }
+            
+            osvControls.enableTelemetry.setValue(0);
+            osvControls.enableOEM.setValue(0);
+            osvControls.enableTLE.setValue(1);
         }
     }
 
@@ -227,6 +247,7 @@ function createControls()
     }}, 'reset');
      
     const textFolder = gui.addFolder('Caption');
+    textFolder.add(guiControls, 'showTargetName');
     textFolder.add(guiControls, 'showLocal');
     textFolder.add(guiControls, 'showUtc');
     textFolder.add(guiControls, 'showJulian');
@@ -247,11 +268,13 @@ function createControls()
 
 
     const dataFolder = gui.addFolder('Source');
+    osvControls.targetName = dataFolder.add(guiControls, 'targetName');
     osvControls.enableTelemetry = dataFolder.add(guiControls, 'enableTelemetry').onChange(function(state)
     {
         if (state)
         {
             osvControls.enableOEM.setValue(0);
+            osvControls.enableTLE.setValue(0);
         }
     });
     osvControls.enableOEM = dataFolder.add(guiControls, 'enableOEM').onChange(function(state) 
@@ -259,8 +282,19 @@ function createControls()
         if (state)
         {
             osvControls.enableTelemetry.setValue(0);
+            osvControls.enableTLE.setValue(0);
         }
     });
+    osvControls.enableTLE = dataFolder.add(guiControls, 'enableTLE').onChange(function(state) 
+    {
+        if (state)
+        {
+            osvControls.enableOEM.setValue(0);
+            osvControls.enableTelemetry.setValue(0);
+        }
+    });
+
+
     osvControls.enableClock = dataFolder.add(guiControls, 'enableClock');
     osvControls.osvYear = dataFolder.add(guiControls, 'osvYear', 1980, 2040, 1);
     osvControls.osvMonth = dataFolder.add(guiControls, 'osvMonth', 1, 12, 1);
@@ -275,6 +309,7 @@ function createControls()
     osvControls.osvVy = dataFolder.add(guiControls, 'osvVy', -10000, 10000, 0.000001);
     osvControls.osvVz = dataFolder.add(guiControls, 'osvVz', -10000, 10000, 0.000001);
     osvControls.osvInputString = dataFolder.add(guiControls, 'osvInputString');
+    osvControls.tleInputString = dataFolder.add(guiControls, 'tleInputString');
  
     dataFolder.add({setClockFromOsv:function()
         {

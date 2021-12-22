@@ -4,6 +4,12 @@ var gl = null;
 var earthShaders = null;
 var lineShaders = null;
 
+// SGP4 test:
+var tleLine1 = '1 25544U 98067A   21356.70730882  .00006423  00000+0  12443-3 0  9993',
+    tleLine2 = '2 25544  51.6431 130.5342 0004540 343.5826 107.2903 15.49048054317816';
+// Initialize a satellite record
+var satrec = satellite.twoline2satrec(tleLine1, tleLine2);
+    
 // Semi-major and semi-minor axes of the WGS84 ellipsoid.
 var a = 6378.1370;
 var b = 6356.75231414;
@@ -234,6 +240,37 @@ function drawScene(time)
         osvControls.osvVx.setValue(ISS.osv.v[0]);
         osvControls.osvVy.setValue(ISS.osv.v[1]);
         osvControls.osvVz.setValue(ISS.osv.v[2]);
+    }
+    else if (guiControls.enableTLE)
+    {
+        const positionAndVelocity = satellite.propagate(satrec, today);
+        // The position_velocity result is a key-value pair of ECI coordinates.
+        // These are the base results from which all other coordinates are derived.
+        const positionEci = positionAndVelocity.position;
+        const velocityEci = positionAndVelocity.velocity;
+
+        osvControls.osvX.setValue(positionEci.x);
+        osvControls.osvY.setValue(positionEci.y);
+        osvControls.osvZ.setValue(positionEci.z);
+        osvControls.osvVx.setValue(velocityEci.x * 1000.0);
+        osvControls.osvVy.setValue(velocityEci.y * 1000.0);
+        osvControls.osvVz.setValue(velocityEci.z * 1000.0);
+
+        ISS.osv = {r: [
+            positionEci.x * 1000.0, 
+            positionEci.y * 1000.0, 
+            positionEci.z * 1000.0], 
+                   v: [
+            velocityEci.x * 1000.0, 
+            velocityEci.y * 1000.0, 
+            velocityEci.z * 1000.0], 
+                ts: today
+                };
+        osvControls.osvMonth.setValue(ISS.osv.ts.getMonth() + 1);
+        osvControls.osvDay.setValue(ISS.osv.ts.getDate());
+        osvControls.osvHour.setValue(ISS.osv.ts.getHours());
+        osvControls.osvMinute.setValue(ISS.osv.ts.getMinutes());
+        osvControls.osvSecond.setValue(ISS.osv.ts.getSeconds());
     }
     else
     {
@@ -492,6 +529,18 @@ function drawScene(time)
  */
 function updateCaptions(rA, decl, lonlat, rAMoon, declMoon, lonlatMoon, today, JT)
 {
+    const targetText = document.getElementById('targetText');
+    targetText.innerHTML = guiControls.targetName;
+    if (guiControls.showTargetName)
+    {
+        targetText.style.visibility = "visible";
+    }
+    else
+    {
+        targetText.style.visibility = "hidden";
+    }
+
+
     const dateText = document.getElementById('dateText');
     const warningText = document.getElementById('warningText');
     const warningContainer = document.getElementById('warningContainer');

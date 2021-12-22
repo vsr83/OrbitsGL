@@ -82,3 +82,31 @@ body {
     font-family : monospace;
     z-index : 6;
 }
+
+#targetText
+{
+    color: #fff;
+    /*position : absolute;*/
+    z-index : 11;
+    background-color: black;
+    opacity: 1;
+    top : 10px;
+    font-size: 25px;
+    font-family : monospace;
+    text-align : center;
+    /*padding-left : 20px;
+    padding-right : 20px;*/
+}
+
+#targetContainer
+{
+    width: 300px;
+    color: #fff;
+    margin : auto;
+    z-index : 11;
+    background-color: black;
+    opacity: 0.5;
+    font-size: 15px;
+    font-family : monospace;
+    padding-top : 10px;
+}
