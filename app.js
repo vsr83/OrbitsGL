@@ -14,6 +14,9 @@ var satrec = satellite.twoline2satrec(tleLine1, tleLine2);
 var a = 6378.1370;
 var b = 6356.75231414;
 
+// Sidereal angle.
+var LST = 0;
+
 // Camera distance from Earth.
 var distance = 5.0 * a;
 
@@ -65,7 +68,14 @@ canvas.addEventListener("mousedown", function(e) {
         rotZ = MathUtils.deg2Rad(-dragX);
         rotX = MathUtils.deg2Rad(-90 - dragY);
         
-        cameraControls.lon.setValue(rotZToLon(MathUtils.rad2Deg(rotZ)));
+        if (guiControls.frameJ2000)
+        {
+            cameraControls.lon.setValue(rotZToLon(MathUtils.rad2Deg(rotZ + LST)));
+        }
+        else 
+        {
+            cameraControls.lon.setValue(rotZToLon(MathUtils.rad2Deg(rotZ)));
+        }
         cameraControls.lat.setValue(rotXToLat(MathUtils.rad2Deg(rotX)));
     }
 });
@@ -311,7 +321,7 @@ function drawScene(time)
 
     // Compute sidereal time perform modulo to avoid floating point accuracy issues with 32-bit
     // floats in the shader:
-    const LST = MathUtils.deg2Rad(TimeConversions.computeSiderealTime(0, JD, JT)) % 360.0;
+    LST = MathUtils.deg2Rad(TimeConversions.computeSiderealTime(0, JD, JT)) % 360.0;
 
     // Convert OSV to Osculating Keplerian elements.
     ISS.kepler = Kepler.osvToKepler(ISS.osv.r, ISS.osv.v, ISS.osv.ts);
