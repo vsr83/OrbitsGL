@@ -96,7 +96,8 @@ function createControls()
         this.osvVx = 0.0;
         this.osvVy = 0.0;
         this.osvVz = 0.0;
-        this.osvInputString = function() {
+        this.insertOSV = function() {
+            osvControls.targetName.setValue("Manual OSV");
             osvControls.enableTelemetry.setValue(0);
             osvControls.enableOEM.setValue(0);
             osvControls.enableTLE.setValue(0);
@@ -135,7 +136,7 @@ function createControls()
                 osvControls.osvVz.setValue(velZ * 1000);
             }
         }
-        this.tleInputString = function() {
+        this.insertTLE = function() {
             osvControls.enableTelemetry.setValue(0);
             var tleIn = prompt("Two-Line Element",  "Paste three lines here.");
             if (tleIn != null) 
@@ -146,9 +147,7 @@ function createControls()
                 satrec = satellite.twoline2satrec(lines[1], lines[2]);
             }
             
-            osvControls.enableTelemetry.setValue(0);
-            osvControls.enableOEM.setValue(0);
-            osvControls.enableTLE.setValue(1);
+            osvControls.enableTLE.setValue(true);
         }
     }
 
@@ -165,6 +164,11 @@ function createControls()
     }
 
     gui = new dat.GUI();
+
+    osvControls.targetName = gui.add(guiControls, 'targetName');
+    osvControls.insertTLE = gui.add(guiControls, 'insertTLE');
+    osvControls.insertOSV = gui.add(guiControls, 'insertOSV');
+
     const displayFolder = gui.addFolder('Display');
     displayFolder.add(guiControls, 'enableGrid');
     displayFolder.add(guiControls, 'enableMap');
@@ -211,7 +215,7 @@ function createControls()
     cameraFolder.add(guiControls, 'lockLatRot');
     cameraControls.lon = cameraFolder.add(guiControls, 'lon', -180, 180, 0.1);
     cameraControls.lat = cameraFolder.add(guiControls, 'lat', -180, 180, 0.1);
-    cameraControls.distance = cameraFolder.add(guiControls, 'distance', a, 10*a, 100);
+    cameraControls.distance = cameraFolder.add(guiControls, 'distance', a*1.01, 1000000, 100);
     cameraFolder.add(guiControls, 'upLon', -180, 180, 1);
     cameraFolder.add(guiControls, 'upLat', -90, 90, 1);
      
@@ -268,9 +272,9 @@ function createControls()
 
 
     const dataFolder = gui.addFolder('Source');
-    osvControls.targetName = dataFolder.add(guiControls, 'targetName');
     osvControls.enableTelemetry = dataFolder.add(guiControls, 'enableTelemetry').onChange(function(state)
     {
+        console.log("enableTelemetry " + state);
         if (state)
         {
             osvControls.enableOEM.setValue(0);
@@ -279,6 +283,7 @@ function createControls()
     });
     osvControls.enableOEM = dataFolder.add(guiControls, 'enableOEM').onChange(function(state) 
     {
+        console.log("enableOEM " + state);
         if (state)
         {
             osvControls.enableTelemetry.setValue(0);
@@ -287,6 +292,7 @@ function createControls()
     });
     osvControls.enableTLE = dataFolder.add(guiControls, 'enableTLE').onChange(function(state) 
     {
+        console.log("enableTLE " + state);
         if (state)
         {
             osvControls.enableOEM.setValue(0);
@@ -302,16 +308,14 @@ function createControls()
     osvControls.osvHour = dataFolder.add(guiControls, 'osvHour', 0, 23, 1);
     osvControls.osvMinute = dataFolder.add(guiControls, 'osvMinute', 0, 59, 1);
     osvControls.osvSecond = dataFolder.add(guiControls, 'osvSecond', 0, 59, 1);
-    osvControls.osvX = dataFolder.add(guiControls, 'osvX', -10000, 10000, 0.000001);
-    osvControls.osvY = dataFolder.add(guiControls, 'osvY', -10000, 10000, 0.000001);
-    osvControls.osvZ = dataFolder.add(guiControls, 'osvZ', -10000, 10000, 0.000001);
-    osvControls.osvVx = dataFolder.add(guiControls, 'osvVx', -10000, 10000, 0.000001);
-    osvControls.osvVy = dataFolder.add(guiControls, 'osvVy', -10000, 10000, 0.000001);
-    osvControls.osvVz = dataFolder.add(guiControls, 'osvVz', -10000, 10000, 0.000001);
-    osvControls.osvInputString = dataFolder.add(guiControls, 'osvInputString');
-    osvControls.tleInputString = dataFolder.add(guiControls, 'tleInputString');
+    osvControls.osvX = dataFolder.add(guiControls, 'osvX', -100000, 100000, 0.000001);
+    osvControls.osvY = dataFolder.add(guiControls, 'osvY', -100000, 100000, 0.000001);
+    osvControls.osvZ = dataFolder.add(guiControls, 'osvZ', -100000, 100000, 0.000001);
+    osvControls.osvVx = dataFolder.add(guiControls, 'osvVx', -100000, 100000, 0.000001);
+    osvControls.osvVy = dataFolder.add(guiControls, 'osvVy', -100000, 100000, 0.000001);
+    osvControls.osvVz = dataFolder.add(guiControls, 'osvVz', -100000, 100000, 0.000001);
  
-    dataFolder.add({setClockFromOsv:function()
+    timeFolder.add({setClockFromOsv:function()
         {
             timeControls.yearControl.setValue(osvControls.osvYear.getValue());
             timeControls.monthControl.setValue(osvControls.osvMonth.getValue());

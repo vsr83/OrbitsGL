@@ -362,7 +362,9 @@ function drawScene(time)
     fieldOfViewRadians = MathUtils.deg2Rad(guiControls.fov);
     var aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
     var zNear = (distance - b) / 2;
-    var zFar = a * 100.0;
+    var zFar = 1000000;
+
+
     var projectionMatrix = m4.perspective(fieldOfViewRadians, aspect, zNear, zFar);
     
 
@@ -425,23 +427,39 @@ function drawScene(time)
     const period = Kepler.computePeriod(kepler_updated.a, kepler_updated.mu);
 
     // Division by 100.0 leads to numerical issues.
-    const jdStep = period / 100.01;
+    const jdStep = period / 200.01;
 
-    // Draw orbit.
     for (let jdDelta = -period * guiControls.orbitsBefore; jdDelta <= period * guiControls.orbitsAfter; 
         jdDelta += jdStep)
     {
         const deltaDate = new Date(today.getTime() +  1000 * jdDelta);
-        const osvProp = Kepler.propagate(kepler_updated, deltaDate);
-        const osv_ECEF = Frames.osvJ2000ToECEF(osvProp, nutPar);
-        const r_ECEF = osv_ECEF.r;
-        const lon = MathUtils.atan2d(r_ECEF[1], r_ECEF[0]);
-        const lat = MathUtils.rad2Deg(Math.asin(r_ECEF[2] / MathUtils.norm(r_ECEF)));
-        const alt = MathUtils.norm(r_ECEF);
 
-        const x = alt * 0.001 * MathUtils.cosd(lat) * MathUtils.cosd(lon);
-        const y = alt * 0.001 * MathUtils.cosd(lat) * MathUtils.sind(lon);
-        const z = alt * 0.001 * MathUtils.sind(lat);
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        if (guiControls.enableTLE)
+        {
+            const osvProp = satellite.propagate(satrec, deltaDate);
+            const posEci = osvProp.position;
+            const gmst = satellite.gstime(deltaDate);
+            const positionEcf   = satellite.eciToEcf(posEci, gmst);
+            x = positionEcf.x;
+            y = positionEcf.y;
+            z = positionEcf.z;
+        }
+        else
+        {
+            const osvProp = Kepler.propagate(kepler_updated, deltaDate);
+            const osv_ECEF = Frames.osvJ2000ToECEF(osvProp, nutPar);
+            const r_ECEF = osv_ECEF.r;
+            const lon = MathUtils.atan2d(r_ECEF[1], r_ECEF[0]);
+            const lat = MathUtils.rad2Deg(Math.asin(r_ECEF[2] / MathUtils.norm(r_ECEF)));
+            const alt = MathUtils.norm(r_ECEF);
+
+            x = alt * 0.001 * MathUtils.cosd(lat) * MathUtils.cosd(lon);
+            y = alt * 0.001 * MathUtils.cosd(lat) * MathUtils.sind(lon);
+            z = alt * 0.001 * MathUtils.sind(lat);
+        }
 
         p.push([x, y, z]);
         if (p.length != 1)
