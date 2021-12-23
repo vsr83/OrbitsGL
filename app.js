@@ -398,6 +398,12 @@ function drawScene(time)
     if (guiControls.lockLonRot)
     {
         rotZ = MathUtils.deg2Rad(-90 - ISS.lon);
+
+        if (guiControls.frameJ2000)
+        {
+            rotZ = MathUtils.deg2Rad(-90 - ISS.lon - MathUtils.rad2Deg(LST));
+        }
+
         cameraControls.lon.setValue(ISS.lon);
     }
     else if (canvas.onmousemove == null)
