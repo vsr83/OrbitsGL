@@ -408,7 +408,14 @@ function drawScene(time)
     }
     else if (canvas.onmousemove == null)
     {
-        rotZ = MathUtils.deg2Rad(-90 - guiControls.lon);
+        if (guiControls.frameJ2000)
+        {
+            rotZ = MathUtils.deg2Rad(-90 - guiControls.lon - MathUtils.rad2Deg(LST));
+        }
+        else 
+        {
+            rotZ = MathUtils.deg2Rad(-90 - guiControls.lon);
+        }
     }
     if (guiControls.lockLatRot)
     {
