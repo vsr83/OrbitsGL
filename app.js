@@ -538,7 +538,8 @@ function drawScene(time)
 
         // The satellite is replaced with a smaller sphere without textures, map nor grid.
         let issMatrix = m4.translate(matrix, ISS.x, ISS.y, ISS.z);
-        issMatrix = m4.scale(issMatrix, 0.01, 0.01, 0.01);
+        const factor = 0.01 * guiControls.satelliteScale;
+        issMatrix = m4.scale(issMatrix, factor, factor, factor);
         earthShaders.draw(issMatrix, rASun, declSun, LST, false, false, false, null);
     }
     if (guiControls.enableSun)
