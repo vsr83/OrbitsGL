@@ -434,7 +434,7 @@ function drawScene(time)
     const period = Kepler.computePeriod(kepler_updated.a, kepler_updated.mu);
 
     // Division by 100.0 leads to numerical issues.
-    const jdStep = period / 200.01;
+    const jdStep = period / (guiControls.orbitPoints + 0.01);
 
     for (let jdDelta = -period * guiControls.orbitsBefore; jdDelta <= period * guiControls.orbitsAfter; 
         jdDelta += jdStep)

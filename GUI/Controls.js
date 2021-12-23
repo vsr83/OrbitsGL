@@ -30,6 +30,7 @@ function createControls()
         this.gridLatResolution = 30;        
         this.orbitsBefore = 1.0;
         this.orbitsAfter = 1.0;
+        this.orbitPoints = 100;
         this.colorGrid = [80, 80, 80];
         this.colorMap = [80, 80, 120];
         this.colorOrbit = [127, 127, 127];
@@ -190,6 +191,7 @@ function createControls()
     });
     displayFolder.add(guiControls, 'orbitsBefore', 0, 5, 0.1);
     displayFolder.add(guiControls, 'orbitsAfter', 0, 5, 0.1);
+    displayFolder.add(guiControls, 'orbitPoints', 10, 1000, 1);
     displayFolder.addColor(guiControls, 'colorGrid')
     .onChange(function()
     {
