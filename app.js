@@ -60,9 +60,17 @@ canvas.addEventListener("mousedown", function(e) {
         dragX = dragXStart - (m.clientX - xStart) / 10.0;
         dragY = dragYStart - (m.clientY - yStart) / 10.0;
 
-        if (dragX > 270.0) dragX -= 360.0;
+        if (guiControls.frameJ2000)
+        {
+            if (dragX - MathUtils.rad2Deg(LST) > 270.0) dragX -= 360.0;
+            if (dragX - MathUtils.rad2Deg(LST) < -90.0) dragX += 360.0;    
+        }
+        else 
+        {
+            if (dragX > 270.0) dragX -= 360.0;
+            if (dragX < -90.0) dragX += 360.0;    
+        }
         if (dragY > 180.0) dragY -= 360.0;
-        if (dragX < -90.0) dragX += 360.0;
         if (dragY < -180.0) dragY += 360.0;
 
         rotZ = MathUtils.deg2Rad(-dragX);
@@ -420,9 +428,9 @@ function drawScene(time)
     {
         if (guiControls.frameJ2000)
         {
-            rotZ = MathUtils.deg2Rad(-90 - guiControls.lon - MathUtils.rad2Deg(LST));
+            rotZ = MathUtils.deg2Rad(-90 - guiControls.lon) - LST;
         }
-        else 
+        else
         {
             rotZ = MathUtils.deg2Rad(-90 - guiControls.lon);
         }
