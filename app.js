@@ -545,43 +545,66 @@ function drawScene(time)
         const d = 2.0 * D * MathUtils.tand(delta / 2);
 
         const scale = (d / 2.0) / a;
-        const xSun = D * MathUtils.cosd(lonlat.lat) * MathUtils.cosd(lonlat.lon);
-        const ySun = D * MathUtils.cosd(lonlat.lat) * MathUtils.sind(lonlat.lon);
-        const zSun = D * MathUtils.sind(lonlat.lat);        
 
-        let sunMatrix = m4.translate(matrix, xSun, ySun, zSun);
+        let sunPos = Coordinates.wgs84ToCart(lonlat.lat, lonlat.lon, D * 1000);
+
+        if (guiControls.frameJ2000)
+        {
+            sunPos = Frames.posECEFToCEP(JT, JD, sunPos);
+            sunPos = Frames.posCEPToJ2000(JT, sunPos, nutPar);
+        }
+        let sunMatrix = m4.translate(matrix, sunPos[0] * 0.001, sunPos[1] * 0.001, sunPos[2] * 0.001);
         sunMatrix = m4.scale(sunMatrix, scale, scale, scale);
         earthShaders.draw(sunMatrix, rASun, declSun, LST, false, false, false, null);
 
         let pSun = [];
         if (guiControls.enableSubSolar)
         {
-            for (let lonDelta = 0; lonDelta < 361.0; lonDelta++)
+            for (let lonDelta = 0; lonDelta <= 360.0; lonDelta++)
             {
-                const xSun = a * MathUtils.cosd(lonlat.lat) * MathUtils.cosd(lonlat.lon + lonDelta);
-                const ySun = a * MathUtils.cosd(lonlat.lat) * MathUtils.sind(lonlat.lon + lonDelta);
-                const zSun = b * MathUtils.sind(lonlat.lat);  
-                
-                pSun.push([xSun, ySun, zSun]);
+                let rSubSolarDelta = Coordinates.wgs84ToCart(lonlat.lat, lonlat.lon + lonDelta, 0);
+
+                if (guiControls.frameJ2000)
+                {
+                    rSubSolarDelta = Frames.posECEFToCEP(JT, JD, rSubSolarDelta);
+                    rSubSolarDelta = Frames.posCEPToJ2000(JT, rSubSolarDelta, nutPar);
+                }
+
                 if (lonDelta != 0.0)
                 {
-                    pSun.push([xSun, ySun, zSun]);
+                    pSun.push(MathUtils.vecmul(rSubSolarDelta, 0.001));
                 }
+                pSun.push(MathUtils.vecmul(rSubSolarDelta, 0.001));
+            }
+            let rSubSolar = Coordinates.wgs84ToCart(lonlat.lat, lonlat.lon, 0);
+            if (guiControls.frameJ2000)
+            {
+                rSubSolar = Frames.posECEFToCEP(JT, JD, rSubSolar);
+                rSubSolar = Frames.posCEPToJ2000(JT, rSubSolar, nutPar);
             }
             pSun.push(pSun[pSun.length - 1]);
-            pSun.push([0, 0, 0]);
-            pSun.push([xSun, ySun, zSun]);
+            //pSun.push([0, 0, 0]);
+            pSun.push(MathUtils.vecmul(rSubSolar, 0.001));
         }
         for (let lonDelta = 0; lonDelta < 361.0; lonDelta++)
         {
-            const xSun = D * MathUtils.cosd(lonlat.lat) * MathUtils.cosd(lonlat.lon + lonDelta);
-            const ySun = D * MathUtils.cosd(lonlat.lat) * MathUtils.sind(lonlat.lon + lonDelta);
-            const zSun = D * MathUtils.sind(lonlat.lat);  
-            
-            pSun.push([xSun, ySun, zSun]);
-            if (lonDelta != 0.0)
+            //const xSun = D * MathUtils.cosd(lonlat.lat) * MathUtils.cosd(lonlat.lon + lonDelta);
+            //const ySun = D * MathUtils.cosd(lonlat.lat) * MathUtils.sind(lonlat.lon + lonDelta);
+            //const zSun = D * MathUtils.sind(lonlat.lat);  
+            let rSubSolarDelta = Coordinates.wgs84ToCart(lonlat.lat, lonlat.lon + lonDelta, D*1000);
+
+            //console.log(MathUtils.norm(rSubSolarDelta));
+
+            if (guiControls.frameJ2000)
             {
-                pSun.push([xSun, ySun, zSun]);
+                rSubSolarDelta = Frames.posECEFToCEP(JT, JD, rSubSolarDelta);
+                rSubSolarDelta = Frames.posCEPToJ2000(JT, rSubSolarDelta, nutPar);
+            }
+        
+            pSun.push(MathUtils.vecmul(rSubSolarDelta, 0.001));
+            if (lonDelta != 0.0 || guiControls.enableSubSolar)
+            {
+                pSun.push(MathUtils.vecmul(rSubSolarDelta, 0.001));
             }
         }
         pSun.push(pSun[pSun.length - 1]);
