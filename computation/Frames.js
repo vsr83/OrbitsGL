@@ -132,6 +132,20 @@
      return {x: rCEP[0], y : rCEP[1], z : rCEP[2]};
   }
  
+    Frames.getMODParams = function(JT)
+    {
+        // IAU 1976 Precession Model
+        // (ESA GNSS Data Processing Vol.1 - A2.5.1)
+        const T = (JT - 2451545.0)/36525.0;
+        
+        // (A.23):
+        const z    = 0.6406161388 * T + 3.0407777777e-04 * T*T + 5.0563888888e-06 *T*T*T;
+        const nu   = 0.5567530277 * T - 1.1851388888e-04 * T*T - 1.1620277777e-05 *T*T*T;
+        const zeta = 0.6406161388 * T + 8.3855555555e-05 * T*T + 4.9994444444e-06 *T*T*T;
+
+        return {z : z, nu : nu, zeta : zeta};
+    }
+
  /**
   * Transformation from CEP to ECEF.
   * 

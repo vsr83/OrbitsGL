@@ -5,6 +5,7 @@ var guiControls = null;
 var osvControls = {};
 var timeControls = {};
 var cameraControls = {};
+var frameControls = {};
 
 /**
  * Create GUI controls.
@@ -80,6 +81,9 @@ function createControls()
         this.upLat = 90.0;
         this.fov = 30;
         
+        this.frameJ2000 = false;
+        this.frameECEF = true;
+
         this.enableTelemetry = true;
         this.enableOEM = false;
         this.enableTLE = false;
@@ -98,14 +102,15 @@ function createControls()
         this.osvVy = 0.0;
         this.osvVz = 0.0;
         this.insertOSV = function() {
-            osvControls.targetName.setValue("Manual OSV");
-            osvControls.enableTelemetry.setValue(0);
-            osvControls.enableOEM.setValue(0);
-            osvControls.enableTLE.setValue(0);
             var osvIn = prompt("Orbit State Vector", 
             "2021-12-05T18:10:00.000 5326.946850262350 4182.210271432980 -611.867277305457 -3.37162589413797 3.42675425977118 -5.96208196793267");
-            if (osvIn != null) 
+            if (osvIn) 
             {
+                osvControls.targetName.setValue("Manual OSV");
+                osvControls.enableTelemetry.setValue(0);
+                osvControls.enableOEM.setValue(0);
+                osvControls.enableTLE.setValue(0);
+
                 const terms = osvIn.split(' ');
                 const timeStamp = new Date(terms[0] + 'Z');
                 const posX = parseFloat(terms[1]);
@@ -138,17 +143,16 @@ function createControls()
             }
         }
         this.insertTLE = function() {
-            osvControls.enableTelemetry.setValue(0);
             var tleIn = prompt("Two-Line Element",  "Paste three lines here.");
-            if (tleIn != null) 
+            if (tleIn) 
             {
                 const lines = tleIn.split('\n');
                 console.log(lines);
                 osvControls.targetName.setValue(lines[0]);
                 satrec = satellite.twoline2satrec(lines[1], lines[2]);
+                osvControls.enableTelemetry.setValue(0);
+                osvControls.enableTLE.setValue(true);
             }
-            
-            osvControls.enableTLE.setValue(true);
         }
     }
 
@@ -169,6 +173,31 @@ function createControls()
     osvControls.targetName = gui.add(guiControls, 'targetName');
     osvControls.insertTLE = gui.add(guiControls, 'insertTLE');
     osvControls.insertOSV = gui.add(guiControls, 'insertOSV');
+
+    const framesFolder = gui.addFolder('Frames');
+    frameControls.frameJ2000 = framesFolder.add(guiControls, 'frameJ2000').onChange(function(state) 
+    {
+        if (state)
+        {
+            frameControls.frameECEF.setValue(0);
+        }
+        else if (!guiControls.frameECEF)
+        {
+            frameControls.frameJ2000.setValue(true);
+        }
+    });
+    frameControls.frameECEF = framesFolder.add(guiControls, 'frameECEF').onChange(function(state) 
+    {
+        if (state)
+        {
+            frameControls.frameJ2000.setValue(0);
+        }
+        else if (!guiControls.frameJ2000)
+        {
+            frameControls.frameECEF.setValue(true);
+        }
+    });
+
 
     const displayFolder = gui.addFolder('Display');
     displayFolder.add(guiControls, 'enableGrid');

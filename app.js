@@ -333,6 +333,8 @@ function drawScene(time)
     let osv_ECEF = Frames.osvJ2000ToECEF(ISS.osvProp);
     ISS.r_ECEF = osv_ECEF.r;
     ISS.v_ECEF = osv_ECEF.v;
+    ISS.r_J2000 = ISS.osvProp.r;
+    ISS.v_J2000 = ISS.osvProp.v;
 
     // Extract the coordinates on the WGS84 ellipsoid.
     let wgs84 = Coordinates.cartToWgs84(ISS.r_ECEF);
@@ -351,9 +353,9 @@ function drawScene(time)
     updateCaptions(rASun, declSun, lonlat, rAMoon, declMoon, lonlatMoon, today, JT);
 
     // Compute the position of the ISS.
-    ISS.x = alt * 0.001 * MathUtils.cosd(ISS.lat) * MathUtils.cosd(ISS.lon);
-    ISS.y = alt * 0.001 * MathUtils.cosd(ISS.lat) * MathUtils.sind(ISS.lon);
-    ISS.z = alt * 0.001 * MathUtils.sind(ISS.lat);
+    //ISS.x = alt * 0.001 * MathUtils.cosd(ISS.lat) * MathUtils.cosd(ISS.lon);
+    //ISS.y = alt * 0.001 * MathUtils.cosd(ISS.lat) * MathUtils.sind(ISS.lon);
+    //ISS.z = alt * 0.001 * MathUtils.sind(ISS.lat);
 
     // Clear the canvas
     gl.clearColor(0, 0, 0, 255);
@@ -422,13 +424,26 @@ function drawScene(time)
         rECEF = ISS.r_ECEF;
     }
 
-    earthShaders.draw(matrix, rASun, declSun, LST, guiControls.enableTextures, guiControls.enableGrid, 
-        guiControls.enableMap, rECEF);
-
     // Compute nutation parameters.
     const julian = TimeConversions.computeJulianTime(today);
     const T = (julian.JT - 2451545.0)/36525.0;
     const nutPar = Nutation.nutationTerms(T);
+
+    let earthMatrix = matrix;
+    if (guiControls.frameJ2000)
+    {
+        const modPar = Frames.getMODParams(JT);
+        earthMatrix = m4.zRotate(earthMatrix, LST);
+        earthMatrix = m4.xRotate(earthMatrix, -MathUtils.deg2Rad(nutPar.eps + nutPar.deps));
+        earthMatrix = m4.zRotate(earthMatrix, -MathUtils.deg2Rad(nutPar.dpsi));
+        earthMatrix = m4.xRotate(earthMatrix,  MathUtils.deg2Rad(nutPar.eps));
+        earthMatrix = m4.zRotate(earthMatrix, -MathUtils.deg2Rad(modPar.z));
+        earthMatrix = m4.yRotate(earthMatrix,  MathUtils.deg2Rad(modPar.nu));
+        earthMatrix = m4.zRotate(earthMatrix, -MathUtils.deg2Rad(modPar.zeta));
+    }
+
+    earthShaders.draw(earthMatrix, rASun, declSun, LST, guiControls.enableTextures, guiControls.enableGrid, 
+        guiControls.enableMap, rECEF);
 
     let p = [];
     const period = Kepler.computePeriod(kepler_updated.a, kepler_updated.mu);
@@ -452,20 +467,40 @@ function drawScene(time)
             const osvPropJ2000 = {r : [posEci.x * 1000.0, posEci.y* 1000.0, posEci.z* 1000.0],
                        v : [velEci.x, velEci.y, velEci.z], 
                        ts : deltaDate};
-            const osvEcef = Frames.osvJ2000ToECEF(osvPropJ2000, nutPar);
-            const r_ECEF = osvEcef.r;
-            x = r_ECEF[0] * 0.001;
-            y = r_ECEF[1] * 0.001;
-            z = r_ECEF[2] * 0.001;
+
+            if (guiControls.frameECEF)
+            {
+                const osvEcef = Frames.osvJ2000ToECEF(osvPropJ2000, nutPar);
+                const r_ECEF = osvEcef.r;
+                x = r_ECEF[0] * 0.001;
+                y = r_ECEF[1] * 0.001;
+                z = r_ECEF[2] * 0.001;
+            }
+            else if (guiControls.frameJ2000)
+            {
+                x = posEci.x;
+                y = posEci.y;
+                z = posEci.z;
+            }
         }
         else
         {
             const osvProp = Kepler.propagate(kepler_updated, deltaDate);
-            const osv_ECEF = Frames.osvJ2000ToECEF(osvProp, nutPar);
-            const r_ECEF = osv_ECEF.r;
-            x = r_ECEF[0] * 0.001;
-            y = r_ECEF[1] * 0.001;
-            z = r_ECEF[2] * 0.001;
+
+            if (guiControls.frameECEF)
+            {
+                const osv_ECEF = Frames.osvJ2000ToECEF(osvProp, nutPar);
+                const r_ECEF = osv_ECEF.r;
+                x = r_ECEF[0] * 0.001;
+                y = r_ECEF[1] * 0.001;
+                z = r_ECEF[2] * 0.001;
+            }
+            else if (guiControls.frameJ2000)
+            {
+                x = osvProp.r[0] * 0.001;
+                y = osvProp.r[1] * 0.001;
+                z = osvProp.r[2] * 0.001;
+            }
         }
 
         p.push([x, y, z]);
@@ -475,6 +510,18 @@ function drawScene(time)
         }
     }
     p.push(p[p.length - 1]);
+    if (guiControls.frameECEF)
+    {
+        ISS.x = ISS.r_ECEF[0] * 0.001;
+        ISS.y = ISS.r_ECEF[1] * 0.001;
+        ISS.z = ISS.r_ECEF[2] * 0.001;
+    }
+    else if (guiControls.frameJ2000)
+    {
+        ISS.x = ISS.r_J2000[0] * 0.001;
+        ISS.y = ISS.r_J2000[1] * 0.001;
+        ISS.z = ISS.r_J2000[2] * 0.001;
+    }
     p.push([ISS.x, ISS.y, ISS.z]);
     p.push([0, 0, 0]);
 
