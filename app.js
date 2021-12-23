@@ -316,8 +316,15 @@ function drawScene(time)
     // Convert OSV to Osculating Keplerian elements.
     ISS.kepler = Kepler.osvToKepler(ISS.osv.r, ISS.osv.v, ISS.osv.ts);
 
-    // Propagate OSV using Osculating Keplerian elements.
-    ISS.osvProp = Kepler.propagate(ISS.kepler, today);
+    if (guiControls.enableTLE)
+    {
+        ISS.osvProp = ISS.osv;
+    }
+    else 
+    {
+        // Propagate OSV using Osculating Keplerian elements.
+        ISS.osvProp = Kepler.propagate(ISS.kepler, today);
+    }
 
     // Compute updated keplerian elements from the propagated OSV.
     let kepler_updated = Kepler.osvToKepler(ISS.osvProp.r, ISS.osvProp.v, ISS.osvProp.ts);
@@ -441,11 +448,18 @@ function drawScene(time)
         {
             const osvProp = satellite.propagate(satrec, deltaDate);
             const posEci = osvProp.position;
-            const gmst = satellite.gstime(deltaDate);
-            const positionEcf   = satellite.eciToEcf(posEci, gmst);
-            x = positionEcf.x;
-            y = positionEcf.y;
-            z = positionEcf.z;
+            const velEci = osvProp.velocity;
+            const osvPropJ2000 = {r : [posEci.x * 1000.0, posEci.y* 1000.0, posEci.z* 1000.0],
+                       v : [velEci.x, velEci.y, velEci.z], 
+                       ts : deltaDate};
+            const osvEcef = Frames.osvJ2000ToECEF(osvPropJ2000, nutPar);
+            const r_ECEF = osvEcef.r;
+            const lon = MathUtils.atan2d(r_ECEF[1], r_ECEF[0]);
+            const lat = MathUtils.rad2Deg(Math.asin(r_ECEF[2] / MathUtils.norm(r_ECEF)));
+            const alt = MathUtils.norm(r_ECEF);
+            x = alt * 0.001 * MathUtils.cosd(lat) * MathUtils.cosd(lon);
+            y = alt * 0.001 * MathUtils.cosd(lat) * MathUtils.sind(lon);
+            z = alt * 0.001 * MathUtils.sind(lat);
         }
         else
         {
