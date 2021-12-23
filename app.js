@@ -454,25 +454,18 @@ function drawScene(time)
                        ts : deltaDate};
             const osvEcef = Frames.osvJ2000ToECEF(osvPropJ2000, nutPar);
             const r_ECEF = osvEcef.r;
-            const lon = MathUtils.atan2d(r_ECEF[1], r_ECEF[0]);
-            const lat = MathUtils.rad2Deg(Math.asin(r_ECEF[2] / MathUtils.norm(r_ECEF)));
-            const alt = MathUtils.norm(r_ECEF);
-            x = alt * 0.001 * MathUtils.cosd(lat) * MathUtils.cosd(lon);
-            y = alt * 0.001 * MathUtils.cosd(lat) * MathUtils.sind(lon);
-            z = alt * 0.001 * MathUtils.sind(lat);
+            x = r_ECEF[0] * 0.001;
+            y = r_ECEF[1] * 0.001;
+            z = r_ECEF[2] * 0.001;
         }
         else
         {
             const osvProp = Kepler.propagate(kepler_updated, deltaDate);
             const osv_ECEF = Frames.osvJ2000ToECEF(osvProp, nutPar);
             const r_ECEF = osv_ECEF.r;
-            const lon = MathUtils.atan2d(r_ECEF[1], r_ECEF[0]);
-            const lat = MathUtils.rad2Deg(Math.asin(r_ECEF[2] / MathUtils.norm(r_ECEF)));
-            const alt = MathUtils.norm(r_ECEF);
-
-            x = alt * 0.001 * MathUtils.cosd(lat) * MathUtils.cosd(lon);
-            y = alt * 0.001 * MathUtils.cosd(lat) * MathUtils.sind(lon);
-            z = alt * 0.001 * MathUtils.sind(lat);
+            x = r_ECEF[0] * 0.001;
+            y = r_ECEF[1] * 0.001;
+            z = r_ECEF[2] * 0.001;
         }
 
         p.push([x, y, z]);
