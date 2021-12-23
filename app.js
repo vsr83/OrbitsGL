@@ -60,30 +60,15 @@ canvas.addEventListener("mousedown", function(e) {
         dragX = dragXStart - (m.clientX - xStart) / 10.0;
         dragY = dragYStart - (m.clientY - yStart) / 10.0;
 
-        if (guiControls.frameJ2000)
-        {
-            if (dragX - MathUtils.rad2Deg(LST) > 270.0) dragX -= 360.0;
-            if (dragX - MathUtils.rad2Deg(LST) < -90.0) dragX += 360.0;    
-        }
-        else 
-        {
-            if (dragX > 270.0) dragX -= 360.0;
-            if (dragX < -90.0) dragX += 360.0;    
-        }
+        if (dragX > 270.0) dragX -= 360.0;
+        if (dragX < -90.0) dragX += 360.0;    
         if (dragY > 180.0) dragY -= 360.0;
         if (dragY < -180.0) dragY += 360.0;
 
         rotZ = MathUtils.deg2Rad(-dragX);
         rotX = MathUtils.deg2Rad(-90 - dragY);
         
-        if (guiControls.frameJ2000)
-        {
-            cameraControls.lon.setValue(rotZToLon(MathUtils.rad2Deg(rotZ + LST)));
-        }
-        else 
-        {
-            cameraControls.lon.setValue(rotZToLon(MathUtils.rad2Deg(rotZ)));
-        }
+        cameraControls.lon.setValue(rotZToLon(MathUtils.rad2Deg(rotZ)));
         cameraControls.lat.setValue(rotXToLat(MathUtils.rad2Deg(rotX)));
     }
 });
@@ -425,15 +410,8 @@ function drawScene(time)
         cameraControls.lon.setValue(ISS.lon);
     }
     else if (canvas.onmousemove == null)
-    {
-        if (guiControls.frameJ2000)
-        {
-            rotZ = MathUtils.deg2Rad(-90 - guiControls.lon) - LST;
-        }
-        else
-        {
-            rotZ = MathUtils.deg2Rad(-90 - guiControls.lon);
-        }
+    {        
+        rotZ = MathUtils.deg2Rad(-90 - guiControls.lon);
     }
     if (guiControls.lockLatRot)
     {
