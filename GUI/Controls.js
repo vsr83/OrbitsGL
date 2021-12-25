@@ -144,16 +144,10 @@ function createControls()
             }
         }
         this.insertTLE = function() {
-            var tleIn = prompt("Two-Line Element",  "Paste three lines here.");
-            if (tleIn) 
-            {
-                const lines = tleIn.split('\n');
-                console.log(lines);
-                osvControls.targetName.setValue(lines[0]);
-                satrec = satellite.twoline2satrec(lines[1], lines[2]);
-                osvControls.enableTelemetry.setValue(0);
-                osvControls.enableTLE.setValue(true);
-            }
+            const TLEcontainer = document.getElementById('TLEcontainer');
+            TLEcontainer.style.visibility = "visible";
+            const TLEinput = document.getElementById('TLEinput');
+            TLEinput.focus();
         }
     }
 
