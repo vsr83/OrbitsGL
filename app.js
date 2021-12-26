@@ -335,7 +335,7 @@ function createViewMatrix()
     {
         rotZ = MathUtils.deg2Rad(-90 - ISS.lon);
 
-        if (guiControls.frameJ2000)
+        if (guiControls.frame === 'J2000')
         {
             rotZ = MathUtils.deg2Rad(-90 - ISS.lon - MathUtils.rad2Deg(LST));
         }
@@ -392,7 +392,7 @@ function drawEarth(matrix, rASun, declSun, LST, JT, nutPar)
     }
 
     let earthMatrix = matrix;
-    if (guiControls.frameJ2000)
+    if (guiControls.frame === 'J2000')
     {
         const modPar = Frames.getMODParams(JT);
         earthMatrix = m4.zRotate(earthMatrix, LST);
@@ -445,12 +445,12 @@ function drawOrbit(today, matrix, kepler_updated, nutPar)
                        v : [velEci.x, velEci.y, velEci.z], 
                        ts : deltaDate};
 
-            if (guiControls.frameECEF)
+            if (guiControls.frame === 'ECEF')
             {
                 const osvEcef = Frames.osvJ2000ToECEF(osvPropJ2000, nutPar);
                 [x, y, z] = MathUtils.vecmul(osvEcef.r, 0.001);
             }
-            else if (guiControls.frameJ2000)
+            else if (guiControls.frame === 'J2000')
             {
                 [x, y, z] = [posEci.x, posEci.y, posEci.z];
             }
@@ -459,12 +459,12 @@ function drawOrbit(today, matrix, kepler_updated, nutPar)
         {
             const osvProp = Kepler.propagate(kepler_updated, deltaDate);
 
-            if (guiControls.frameECEF)
+            if (guiControls.frame === 'ECEF')
             {
                 const osv_ECEF = Frames.osvJ2000ToECEF(osvProp, nutPar);
                 [x, y, z] = MathUtils.vecmul(osv_ECEF.r, 0.001);
             }
-            else if (guiControls.frameJ2000)
+            else if (guiControls.frame === 'J2000')
             {
                 [x, y, z] = MathUtils.vecmul(osvProp.r, 0.001);
             }
@@ -477,11 +477,11 @@ function drawOrbit(today, matrix, kepler_updated, nutPar)
         }
     }
     p.push(p[p.length - 1]);
-    if (guiControls.frameECEF)
+    if (guiControls.frame === 'ECEF')
     {
         [ISS.x, ISS.y, ISS.z] = MathUtils.vecmul(ISS.r_ECEF,  0.001);
     }
-    else if (guiControls.frameJ2000)
+    else if (guiControls.frame === 'J2000')
     {
         [ISS.x, ISS.y, ISS.z] = MathUtils.vecmul(ISS.r_J2000,  0.001);
     }
@@ -529,7 +529,7 @@ function drawSun(lonlat, JT, JD, rASun, declSun, matrix, nutPar)
 
     let sunPos = Coordinates.wgs84ToCart(lonlat.lat, lonlat.lon, D * 1000);
 
-    if (guiControls.frameJ2000)
+    if (guiControls.frame === 'J2000')
     {
         sunPos = Frames.posECEFToCEP(JT, JD, sunPos);
         sunPos = Frames.posCEPToJ2000(JT, sunPos, nutPar);
@@ -545,7 +545,7 @@ function drawSun(lonlat, JT, JD, rASun, declSun, matrix, nutPar)
         {
             let rSubSolarDelta = Coordinates.wgs84ToCart(lonlat.lat, lonlat.lon + lonDelta, 0);
 
-            if (guiControls.frameJ2000)
+            if (guiControls.frame === 'J2000')
             {
                 rSubSolarDelta = Frames.posECEFToCEP(JT, JD, rSubSolarDelta);
                 rSubSolarDelta = Frames.posCEPToJ2000(JT, rSubSolarDelta, nutPar);
@@ -570,7 +570,7 @@ function drawSun(lonlat, JT, JD, rASun, declSun, matrix, nutPar)
     {
         let rSubSolarDelta = Coordinates.wgs84ToCart(lonlat.lat, lonlat.lon + lonDelta, D*1000);
 
-        if (guiControls.frameJ2000)
+        if (guiControls.frame === 'J2000')
         {
             rSubSolarDelta = Frames.posECEFToCEP(JT, JD, rSubSolarDelta);
             rSubSolarDelta = Frames.posCEPToJ2000(JT, rSubSolarDelta, nutPar);
