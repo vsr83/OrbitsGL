@@ -43,7 +43,7 @@ canvas.addEventListener("mouseleave", function(e) {
     canvas.onmousemove = null;
 });
 
-document.addEventListener("wheel", function(e) {
+canvas.addEventListener("wheel", function(e) {
     distance *= (e.deltaY * 0.0001 + 1);
     cameraControls.distance.setValue(distance);
 });
