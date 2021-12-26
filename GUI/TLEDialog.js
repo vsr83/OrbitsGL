@@ -13,8 +13,7 @@ TLEEnter.onclick = function()
     console.log(lines);
     osvControls.targetName.setValue(lines[0]);
     satrec = satellite.twoline2satrec(lines[1], lines[2]);
-    osvControls.enableTelemetry.setValue(0);
-    osvControls.enableTLE.setValue(true);
+    osvControls.source.setValue('TLE');
 }
 TLECancel.onclick = function() 
 {

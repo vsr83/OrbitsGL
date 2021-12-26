@@ -133,7 +133,7 @@ function drawScene(time)
     ISS.kepler = Kepler.osvToKepler(ISS.osv.r, ISS.osv.v, ISS.osv.ts);
 
     // Propagate OSV only if SGP4 is not used.
-    if (guiControls.enableTLE)
+    if (guiControls.source === "TLE")
     {
         ISS.osvProp = ISS.osv;
     }
@@ -210,7 +210,7 @@ function createOsv(today)
 
     // Use latest telemetry only if enabled. Then, the telemetry set from the UI controls is not
     // overwritten below.
-    if (guiControls.enableTelemetry)
+    if (guiControls.source === "Telemetry")
     {
         osvOut = ISS.osvIn;
 
@@ -227,7 +227,7 @@ function createOsv(today)
         osvControls.osvVy.setValue(ISS.osv.v[1]);
         osvControls.osvVz.setValue(ISS.osv.v[2]);
     }
-    else if (guiControls.enableOEM)
+    else if (guiControls.source === "OEM")
     {
         const osvOem = getClosestOEMOsv(today);
         osvOut = osvOem;
@@ -244,15 +244,13 @@ function createOsv(today)
         osvControls.osvVy.setValue(ISS.osv.v[1]);
         osvControls.osvVz.setValue(ISS.osv.v[2]);
     }
-    else if (guiControls.enableTLE)
+    else if (guiControls.source === "TLE")
     {
         const positionAndVelocity = satellite.propagate(satrec, today);
         // The position_velocity result is a key-value pair of ECI coordinates.
         // These are the base results from which all other coordinates are derived.
         const positionEci = positionAndVelocity.position;
         const velocityEci = positionAndVelocity.velocity;
-
-        console.log(positionEci);
 
         osvControls.osvX.setValue(positionEci.x);
         osvControls.osvY.setValue(positionEci.y);
@@ -278,7 +276,7 @@ function createOsv(today)
         osvControls.osvMinute.setValue(today.getMinutes());
         osvControls.osvSecond.setValue(today.getSeconds());
     }
-    else
+    else if (guiControls.source === "OSV")
     {
         // Set telemetry from UI controls.
         osvOut = {r: [
@@ -438,7 +436,7 @@ function drawOrbit(today, matrix, kepler_updated, nutPar)
         let x = 0;
         let y = 0;
         let z = 0;
-        if (guiControls.enableTLE)
+        if (guiControls.source === "TLE")
         {
             const osvProp = satellite.propagate(satrec, deltaDate);
             const posEci = osvProp.position;

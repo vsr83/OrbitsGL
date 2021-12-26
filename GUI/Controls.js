@@ -85,9 +85,13 @@ function createControls()
         this.frameJ2000 = false;
         this.frameECEF = true;
 
+
+        this.source = "Telemetry";
+        /*
         this.enableTelemetry = true;
         this.enableOEM = false;
         this.enableTLE = false;
+        */
         this.enableClock = true;
         this.targetName = "ISS (ZARYA)";
         this.osvYear = 2021;
@@ -108,9 +112,7 @@ function createControls()
             if (osvIn) 
             {
                 osvControls.targetName.setValue("Manual OSV");
-                osvControls.enableTelemetry.setValue(0);
-                osvControls.enableOEM.setValue(0);
-                osvControls.enableTLE.setValue(0);
+                osvControls.source.setValue('OSV');
 
                 const terms = osvIn.split(' ');
                 const timeStamp = new Date(terms[0] + 'Z');
@@ -299,35 +301,7 @@ function createControls()
 
 
     const dataFolder = gui.addFolder('Source');
-    osvControls.enableTelemetry = dataFolder.add(guiControls, 'enableTelemetry').onChange(function(state)
-    {
-        console.log("enableTelemetry " + state);
-        if (state)
-        {
-            osvControls.enableOEM.setValue(0);
-            osvControls.enableTLE.setValue(0);
-        }
-    });
-    osvControls.enableOEM = dataFolder.add(guiControls, 'enableOEM').onChange(function(state) 
-    {
-        console.log("enableOEM " + state);
-        if (state)
-        {
-            osvControls.enableTelemetry.setValue(0);
-            osvControls.enableTLE.setValue(0);
-        }
-    });
-    osvControls.enableTLE = dataFolder.add(guiControls, 'enableTLE').onChange(function(state) 
-    {
-        console.log("enableTLE " + state);
-        if (state)
-        {
-            osvControls.enableOEM.setValue(0);
-            osvControls.enableTelemetry.setValue(0);
-        }
-    });
-
-
+    osvControls.source = dataFolder.add(guiControls, 'source', ['Telemetry', 'OEM', 'TLE', 'OSV']); 
     osvControls.enableClock = dataFolder.add(guiControls, 'enableClock');
     osvControls.osvYear = dataFolder.add(guiControls, 'osvYear', 1980, 2040, 1);
     osvControls.osvMonth = dataFolder.add(guiControls, 'osvMonth', 1, 12, 1);
