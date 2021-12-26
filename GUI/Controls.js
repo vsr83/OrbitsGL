@@ -45,7 +45,7 @@ function createControls()
         this.deltaSecs = 0;
         this.showTargetName = true;
         this.showLocal = false;
-        this.showUtc = false;
+        this.showUtc = true;
         this.showJulian = false;
         this.showSunRa = false;
         this.showSunDecl = false;
@@ -55,9 +55,9 @@ function createControls()
         this.showMoonDecl = false;
         this.showMoonLatitude = false;
         this.showMoonLongitude = false;
-        this.showTelemetry = true;
-        this.showOsvGM2000 = true;
-        this.showOsvECEF = true;
+        this.showTelemetry = false;
+        this.showOsvGM2000 = false;
+        this.showOsvECEF = false;
         this.showIssLocation = true;
         this.showIssElements = false;
         this.dateYear = initDate.getFullYear();
