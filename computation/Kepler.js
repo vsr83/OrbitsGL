@@ -50,23 +50,26 @@ Kepler.computePeriod = function(a, mu)
 Kepler.solveEccentricAnomaly = function(M, e, tolerance, maxIterations)
 {
     let iterationCount = 0;
-    let error = this.nrTolerance + 1.0;
+    let error = tolerance + 1.0;
 
     // Eccentric anomaly.
-    let eA = MathUtils.deg2Rad(M);
+    let Mrad = MathUtils.deg2Rad(M);
+    let eA = Mrad;
 
-    while (error > this.nrTolerance)
+    while (error > tolerance)
     {
         iterationCount++;
 
         if (iterationCount > maxIterations)
         {
-            // TODO: throw exception
+            throw new Error('Failed to converge. ' + e + " " + M + " " + eA);
         }
 
-        eA -= (eA - e * Math.sin(eA) - M) / (1 - e * Math.cos(eA));
-        error = Math.abs(eA - e * Math.sin(eA) - M);
+        eA -= (eA - e * Math.sin(eA) - Mrad) / (1 - e * Math.cos(eA));
+        error = Math.abs(eA - e * Math.sin(eA) - Mrad);
     }
+
+    //console.log(iterationCount);
 
     // Iteration successful.
     return MathUtils.rad2Deg(eA);
@@ -194,8 +197,7 @@ Kepler.propagate = function(kepler, dateIn)
 
     // Propagate mean anomaly according to the computed difference and solve natural anoamaly.
     const Mext = kepler.M + 360.0 * diff / (Kepler.computePeriod(kepler.a, kepler.mu) * 1000.0);
-    const Eext = this.solveEccentricAnomaly(Mext, kepler.ecc_norm, 1e-7, 10);
-    const fext = this.computeNaturalAnomaly(kepler.ecc_norm, Eext);
+    const Eext = this.solveEccentricAnomaly(Mext, kepler.ecc_norm, 1e-5, 10);
 
     const r_orbital = [kepler.a * (MathUtils.cosd(Eext) - kepler.ecc_norm), kepler.b * MathUtils.sind(Eext), 0];
 
