@@ -558,7 +558,7 @@ function drawSun(lonlat, JT, JD, rASun, declSun, matrix, nutPar)
             pSun.push(MathUtils.vecmul(rSubSolarDelta, 0.001));
         }
         let rSubSolar = Coordinates.wgs84ToCart(lonlat.lat, lonlat.lon, 0);
-        if (guiControls.frameJ2000)
+        if (guiControls.frame === 'J2000')
         {
             rSubSolar = Frames.posECEFToCEP(JT, JD, rSubSolar);
             rSubSolar = Frames.posCEPToJ2000(JT, rSubSolar, nutPar);
