@@ -144,6 +144,13 @@ function createControls()
             const TLEinput = document.getElementById('TLEinput');
             TLEinput.focus();
         }
+        this.exportOSV = function() {
+            const osv = ISS.osv;
+            const timeString = osv.ts.toISOString().slice(0, -1);
+            const posString = osv.r[0] * 0.001 + " " + osv.r[1] * 0.001 + " " + osv.r[2] * 0.001;
+            const velString = osv.v[0] * 0.001 + " " + osv.v[1] * 0.001 + " " + osv.v[2] * 0.001;
+            window.alert(timeString + " " + posString + " " + velString);
+        }
     }
 
     /**
@@ -163,6 +170,7 @@ function createControls()
     osvControls.targetName = gui.add(guiControls, 'targetName').name('Target Name');
     osvControls.insertTLE = gui.add(guiControls, 'insertTLE').name('Insert TLE');
     osvControls.insertOSV = gui.add(guiControls, 'insertOSV').name('Insert OSV');
+    osvControls.exportOSV = gui.add(guiControls, 'exportOSV').name('Export OSV');
 
     const displayFolder = gui.addFolder('Display');
     displayFolder.add(guiControls, 'enableGrid').name('Grid Lines');
