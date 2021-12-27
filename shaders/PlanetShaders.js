@@ -107,6 +107,12 @@ class PlanetShaders
                 float altitude = asin(cos(h)*cos(u_decl)*cos(lat) + sin(u_decl)*sin(lat));
                 altitude = rad2deg(altitude);
     
+                // The argument of asin may be larger than 1.0 with Intel GPUs.
+                if (isnan(altitude))
+                {
+                    altitude = 90.0;
+                }
+
                 if (altitude > 0.0)
                 {
                     // Day. 
