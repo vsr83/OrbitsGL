@@ -117,17 +117,17 @@ class PlanetShaders
                 else if (altitude > -6.0)
                 {
                     // Civil twilight.
-                    outColor = (0.5*texture(u_imageNight, v_texcoord) + 1.5*texture(u_imageDay, v_texcoord)) * 0.5;
+                    outColor = mix(texture(u_imageNight, v_texcoord), texture(u_imageDay, v_texcoord), 0.75);
                 }
                 else if (altitude > -12.0)
                 {
                     // Nautical twilight.
-                    outColor = (texture(u_imageNight, v_texcoord) + texture(u_imageDay, v_texcoord)) * 0.5;
+                    outColor = mix(texture(u_imageNight, v_texcoord), texture(u_imageDay, v_texcoord), 0.5);
                 }
                 else if (altitude > -18.0)
                 {
                     // Astronomical twilight.
-                    outColor = (1.5*texture(u_imageNight, v_texcoord) + 0.5*texture(u_imageDay, v_texcoord)) * 0.5;
+                    outColor = mix(texture(u_imageNight, v_texcoord), texture(u_imageDay, v_texcoord), 0.25);
                 }
                 else
                 {
