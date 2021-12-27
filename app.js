@@ -99,6 +99,13 @@ function drawScene(time)
         + 60 * 1000 * guiControls.deltaMins
         + 1000 * guiControls.deltaSecs
         + dateDelta);
+
+        timeControls.yearControl.setValue(today.getFullYear());
+        timeControls.monthControl.setValue(today.getMonth() + 1);
+        timeControls.dayControl.setValue(today.getDate());
+        timeControls.hourControl.setValue(today.getHours());
+        timeControls.minuteControl.setValue(today.getMinutes());
+        timeControls.secondControl.setValue(today.getSeconds());
     }
 
     // Use latest telemetry only if enabled. Then, the telemetry set from the UI controls is not
