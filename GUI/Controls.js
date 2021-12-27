@@ -99,6 +99,8 @@ function createControls()
         this.osvVx = 0.0;
         this.osvVy = 0.0;
         this.osvVz = 0.0;
+
+        // Initialize OSV from a string.
         this.insertOSV = function() {
             var osvIn = prompt("Orbit State Vector", 
             "2021-12-05T18:10:00.000 5326.946850262350 4182.210271432980 -611.867277305457 -3.37162589413797 3.42675425977118 -5.96208196793267");
@@ -138,14 +140,18 @@ function createControls()
                 osvControls.osvVz.setValue(velZ * 1000);
             }
         }
+
+        // Initialize TLE from a string.
         this.insertTLE = function() {
             const TLEcontainer = document.getElementById('TLEcontainer');
             TLEcontainer.style.visibility = "visible";
             const TLEinput = document.getElementById('TLEinput');
             TLEinput.focus();
         }
+
+        // Export OSV into a string.
         this.exportOSV = function() {
-            const osv = ISS.osv;
+            const osv = ISS.osvProp;
             const timeString = osv.ts.toISOString().slice(0, -1);
             const posString = osv.r[0] * 0.001 + " " + osv.r[1] * 0.001 + " " + osv.r[2] * 0.001;
             const velString = osv.v[0] * 0.001 + " " + osv.v[1] * 0.001 + " " + osv.v[2] * 0.001;
@@ -158,11 +164,14 @@ function createControls()
      */
     function configureTime()
     {
-        const newDate = new Date(guiControls.dateYear, parseInt(guiControls.dateMonth)-1, guiControls.dateDay, 
-            guiControls.timeHour, guiControls.timeMinute, guiControls.timeSecond).getTime();
+        if (!guiControls.enableClock)
+        {
+            const newDate = new Date(guiControls.dateYear, parseInt(guiControls.dateMonth)-1, guiControls.dateDay, 
+                guiControls.timeHour, guiControls.timeMinute, guiControls.timeSecond).getTime();
 
-        const today = new Date().getTime();
-        dateDelta = newDate - today;
+            const today = new Date().getTime();
+            dateDelta = newDate - today;
+        }
     }
 
     gui = new dat.GUI();
@@ -230,6 +239,7 @@ function createControls()
     cameraFolder.add(guiControls, 'upLat', -90, 90, 1).name('Latitude Up');
      
     const timeFolder = gui.addFolder('Time');
+    timeControls.enableClock = timeFolder.add(guiControls, 'enableClock').name('Enable Clock');
     timeControls.warpSeconds = timeFolder.add(guiControls, 'warpSeconds', -60, 60, 1).onChange(configureTime).name('Warp Size'); 
     timeFolder.add(guiControls, 'timeWarp').name('Time Warp');
     timeControls.yearControl = timeFolder.add(guiControls, 'dateYear', 1980, 2040, 1).onChange(configureTime).name('Year');
@@ -292,7 +302,6 @@ function createControls()
 
     const dataFolder = gui.addFolder('Data Source');
     osvControls.source = dataFolder.add(guiControls, 'source', ['Telemetry', 'OEM', 'TLE', 'OSV']).name('Data Source'); 
-    osvControls.enableClock = dataFolder.add(guiControls, 'enableClock').name('Enable Clock');
     osvControls.osvYear = dataFolder.add(guiControls, 'osvYear', 1980, 2040, 1).name('OSV Year');
     osvControls.osvMonth = dataFolder.add(guiControls, 'osvMonth', 1, 12, 1).name('OSV Month');
     osvControls.osvDay = dataFolder.add(guiControls, 'osvDay', 1, 31, 1).name('OSV Day');
