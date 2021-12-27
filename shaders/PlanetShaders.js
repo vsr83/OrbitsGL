@@ -104,15 +104,24 @@ class PlanetShaders
                 float lat = PI * (0.5 - v_texcoord.y);
                 float LSTlon = u_LST + lon;
                 float h = LSTlon - u_rA;
-                float altitude = asin(cos(h)*cos(u_decl)*cos(lat) + sin(u_decl)*sin(lat));
-                altitude = rad2deg(altitude);
-    
-                // The argument of asin may be larger than 1.0 with Intel GPUs.
-                if (isnan(altitude))
+                float altitudeParam = cos(h)*cos(u_decl)*cos(lat) + sin(u_decl)*sin(lat);
+                float altitude = 0.0;
+
+                // The argument of asin may be outside of the interval [-1, 1] with Intel GPUs.
+                if (altitudeParam > 1.0)
                 {
                     altitude = 90.0;
                 }
-
+                else if (altitudeParam < -1.0)
+                {
+                    altitude = -90.0;
+                }
+                else 
+                {
+                    altitude = asin(altitudeParam);
+                    altitude = rad2deg(altitude);
+                }
+    
                 if (altitude > 0.0)
                 {
                     // Day. 
