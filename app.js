@@ -9,7 +9,7 @@ var tleLine1 = '1 25544U 98067A   21356.70730882  .00006423  00000+0  12443-3 0 
     tleLine2 = '2 25544  51.6431 130.5342 0004540 343.5826 107.2903 15.49048054317816';
 // Initialize a satellite record
 var satrec = satellite.twoline2satrec(tleLine1, tleLine2);
-    
+
 // Semi-major and semi-minor axes of the WGS84 ellipsoid.
 var a = 6378.1370;
 var b = 6356.75231414;

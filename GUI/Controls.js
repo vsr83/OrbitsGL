@@ -3,6 +3,7 @@ var guiControls = null;
 
 // Hold OSV controls.
 var osvControls = {};
+var tleControls = {};
 var timeControls = {};
 var cameraControls = {};
 var frameControls = {};
@@ -100,6 +101,25 @@ function createControls()
         this.osvVy = 0.0;
         this.osvVz = 0.0;
 
+        this.tleSatName = 'ISS (ZARYA)';
+        this.tleLaunchYear = "98";
+        this.tleLaunchNumber = "067";
+        this.tlePiece = 'A__';
+        this.tleYear = "21";
+        this.tleDay = "356.70730882";
+        this.tleBalDer = "_.00006423";
+        this.tleSecDer = "_00000+0";
+        this.tleDragTerm = "_12443-3";
+        this.tleElemSetNumber = "_999";
+        this.tleCatalogNo = "25544";
+        this.tleInclination = "51.6431";
+        this.tleRA = "130.5342";
+        this.tleEccentricity = "0.0004540";
+        this.tleArgPerigee = "343.5826";
+        this.tleMeanAnomaly = "107.2903";
+        this.tleMeanMotion = "15.49048054";
+        this.tleRev = "31781";
+
         // Initialize OSV from a string.
         this.insertOSV = function() {
             var osvIn = prompt("Orbit State Vector", 
@@ -157,6 +177,16 @@ function createControls()
             const velString = osv.v[0] * 0.001 + " " + osv.v[1] * 0.001 + " " + osv.v[2] * 0.001;
             window.alert(timeString + " " + posString + " " + velString);
         }
+
+        this.createTLE = function() {
+            const lines = createTLE();
+
+            const TLEcontainer = document.getElementById('TLEcontainer');
+            TLEcontainer.style.visibility = "visible";
+            const TLEinput = document.getElementById('TLEinput');
+            TLEinput.focus();
+            TLEinput.value = lines;
+        }
     }
 
     /**
@@ -180,6 +210,7 @@ function createControls()
     osvControls.insertTLE = gui.add(guiControls, 'insertTLE').name('Insert TLE');
     osvControls.insertOSV = gui.add(guiControls, 'insertOSV').name('Insert OSV');
     osvControls.exportOSV = gui.add(guiControls, 'exportOSV').name('Export OSV');
+    osvControls.source = gui.add(guiControls, 'source', ['Telemetry', 'OEM', 'TLE', 'OSV']).name('Data Source'); 
 
     const displayFolder = gui.addFolder('Display');
     displayFolder.add(guiControls, 'enableGrid').name('Grid Lines');
@@ -298,22 +329,41 @@ function createControls()
     textFolder.add(guiControls, 'showIssLocation').name('Geodetic Coordinates');
     textFolder.add(guiControls, 'showIssElements').name('Osculating Elements');
  
+    const tleFolder = gui.addFolder('Two-Line Element');
+    tleControls.createTLE = tleFolder.add(guiControls, 'createTLE').name('Export TLE');
+    tleControls.tleSatName = tleFolder.add(guiControls, 'tleSatName').name('Satellite Name');
+    tleControls.tleLaunchYear = tleFolder.add(guiControls, 'tleLaunchYear').name('Launch Year');
+    tleControls.tleLaunchNumber = tleFolder.add(guiControls, 'tleLaunchNumber').name('Launch Number');
+    tleControls.tlePiece = tleFolder.add(guiControls, 'tlePiece').name('Piece of Launch');
+    tleControls.tleYear = tleFolder.add(guiControls, 'tleYear').name('Epoch Year');
+    tleControls.tleDay = tleFolder.add(guiControls, 'tleDay').name('Epoch Day');
+    tleControls.tleBalDer = tleFolder.add(guiControls, 'tleBalDer').name('Mean Motion 1st Der');
+   // tleControls.tleSecDer = tleFolder.add(guiControls, 'tleSecDer').name('Mean Motion 2st Der');
+    tleControls.tleDragTerm = tleFolder.add(guiControls, 'tleDragTerm').name('The drag term');
+    tleControls.tleElemSetNumber = tleFolder.add(guiControls, 'tleElemSetNumber').name('Element Set Number');
 
+    tleControls.tleCatalogNo = tleFolder.add(guiControls, 'tleCatalogNo').name('Catalog Number');
+    tleControls.tleInclination = tleFolder.add(guiControls, 'tleInclination').name('Inclination');
+    tleControls.tleRA = tleFolder.add(guiControls, 'tleRA').name('RA of Asc. Node');
+    tleControls.tleEccentricity = tleFolder.add(guiControls, 'tleEccentricity').name('Eccentricity');
+    tleControls.tleArgPerigee = tleFolder.add(guiControls, 'tleArgPerigee').name('Argument of Perigee');
+    tleControls.tleMeanAnomaly = tleFolder.add(guiControls, 'tleMeanAnomaly').name('Mean Anomaly');
+    tleControls.tleMeanMotion = tleFolder.add(guiControls, 'tleMeanMotion').name('Mean Motion');
+    tleControls.tleRev = tleFolder.add(guiControls, 'tleRev').name('Revolution Number');
 
-    const dataFolder = gui.addFolder('Data Source');
-    osvControls.source = dataFolder.add(guiControls, 'source', ['Telemetry', 'OEM', 'TLE', 'OSV']).name('Data Source'); 
-    osvControls.osvYear = dataFolder.add(guiControls, 'osvYear', 1980, 2040, 1).name('OSV Year');
-    osvControls.osvMonth = dataFolder.add(guiControls, 'osvMonth', 1, 12, 1).name('OSV Month');
-    osvControls.osvDay = dataFolder.add(guiControls, 'osvDay', 1, 31, 1).name('OSV Day');
-    osvControls.osvHour = dataFolder.add(guiControls, 'osvHour', 0, 23, 1).name('OSV Hour');
-    osvControls.osvMinute = dataFolder.add(guiControls, 'osvMinute', 0, 59, 1).name('OSV Minute');
-    osvControls.osvSecond = dataFolder.add(guiControls, 'osvSecond', 0, 59, 1).name('OSV Second');
-    osvControls.osvX = dataFolder.add(guiControls, 'osvX', -100000, 100000, 0.000001).name('X (km)');
-    osvControls.osvY = dataFolder.add(guiControls, 'osvY', -100000, 100000, 0.000001).name('Y (km)');
-    osvControls.osvZ = dataFolder.add(guiControls, 'osvZ', -100000, 100000, 0.000001).name('Z (km)');
-    osvControls.osvVx = dataFolder.add(guiControls, 'osvVx', -100000, 100000, 0.000001).name('Vx (m/s)');
-    osvControls.osvVy = dataFolder.add(guiControls, 'osvVy', -100000, 100000, 0.000001).name('Vy (m/s)');
-    osvControls.osvVz = dataFolder.add(guiControls, 'osvVz', -100000, 100000, 0.000001).name('Vz (m/s)');
+    const osvFolder = gui.addFolder('Orbit State Vector');
+    osvControls.osvYear = osvFolder.add(guiControls, 'osvYear', 1980, 2040, 1).name('OSV Year');
+    osvControls.osvMonth = osvFolder.add(guiControls, 'osvMonth', 1, 12, 1).name('OSV Month');
+    osvControls.osvDay = osvFolder.add(guiControls, 'osvDay', 1, 31, 1).name('OSV Day');
+    osvControls.osvHour = osvFolder.add(guiControls, 'osvHour', 0, 23, 1).name('OSV Hour');
+    osvControls.osvMinute = osvFolder.add(guiControls, 'osvMinute', 0, 59, 1).name('OSV Minute');
+    osvControls.osvSecond = osvFolder.add(guiControls, 'osvSecond', 0, 59, 1).name('OSV Second');
+    osvControls.osvX = osvFolder.add(guiControls, 'osvX', -100000, 100000, 0.000001).name('X (km)');
+    osvControls.osvY = osvFolder.add(guiControls, 'osvY', -100000, 100000, 0.000001).name('Y (km)');
+    osvControls.osvZ = osvFolder.add(guiControls, 'osvZ', -100000, 100000, 0.000001).name('Z (km)');
+    osvControls.osvVx = osvFolder.add(guiControls, 'osvVx', -100000, 100000, 0.000001).name('Vx (m/s)');
+    osvControls.osvVy = osvFolder.add(guiControls, 'osvVy', -100000, 100000, 0.000001).name('Vy (m/s)');
+    osvControls.osvVz = osvFolder.add(guiControls, 'osvVz', -100000, 100000, 0.000001).name('Vz (m/s)');
       
     gui.add(guiControls, 'GitHub');
 }
