@@ -168,6 +168,7 @@ function drawScene(time)
         ISS.osvProp = Kepler.propagate(ISS.kepler, today);
         if (guiControls.keplerFix)
         {
+            osvControls.osvYear.setValue(ISS.osvProp.ts.getFullYear());
             osvControls.osvMonth.setValue(ISS.osvProp.ts.getMonth() + 1);
             osvControls.osvDay.setValue(ISS.osvProp.ts.getDate());
             osvControls.osvHour.setValue(ISS.osvProp.ts.getHours());
@@ -275,7 +276,7 @@ function createOsv(today)
     {
         osvOut = ISS.osvIn;
 
-        //osvControls.osvYear.setValue(dateNow.getFullYear());
+        osvControls.osvYear.setValue(ISS.osv.ts.getFullYear());
         osvControls.osvMonth.setValue(ISS.osv.ts.getMonth() + 1);
         osvControls.osvDay.setValue(ISS.osv.ts.getDate());
         osvControls.osvHour.setValue(ISS.osv.ts.getHours());
@@ -293,17 +294,18 @@ function createOsv(today)
         const osvOem = getClosestOEMOsv(today);
         osvOut = osvOem;
 
-        osvControls.osvMonth.setValue(ISS.osv.ts.getMonth() + 1);
-        osvControls.osvDay.setValue(ISS.osv.ts.getDate());
-        osvControls.osvHour.setValue(ISS.osv.ts.getHours());
-        osvControls.osvMinute.setValue(ISS.osv.ts.getMinutes());
-        osvControls.osvSecond.setValue(ISS.osv.ts.getSeconds());
-        osvControls.osvX.setValue(ISS.osv.r[0] * 0.001);
-        osvControls.osvY.setValue(ISS.osv.r[1] * 0.001);
-        osvControls.osvZ.setValue(ISS.osv.r[2] * 0.001);
-        osvControls.osvVx.setValue(ISS.osv.v[0]);
-        osvControls.osvVy.setValue(ISS.osv.v[1]);
-        osvControls.osvVz.setValue(ISS.osv.v[2]);
+        osvControls.osvYear.setValue(osvOut.ts.getFullYear());
+        osvControls.osvMonth.setValue(osvOut.ts.getMonth() + 1);
+        osvControls.osvDay.setValue(osvOut.ts.getDate());
+        osvControls.osvHour.setValue(osvOut.ts.getHours());
+        osvControls.osvMinute.setValue(osvOut.ts.getMinutes());
+        osvControls.osvSecond.setValue(osvOut.ts.getSeconds());
+        osvControls.osvX.setValue(osvOut.r[0] * 0.001);
+        osvControls.osvY.setValue(osvOut.r[1] * 0.001);
+        osvControls.osvZ.setValue(osvOut.r[2] * 0.001);
+        osvControls.osvVx.setValue(osvOut.v[0]);
+        osvControls.osvVy.setValue(osvOut.v[1]);
+        osvControls.osvVz.setValue(osvOut.v[2]);
     }
     else if (guiControls.source === "TLE")
     {
@@ -330,7 +332,7 @@ function createOsv(today)
             velocityEci.z * 1000.0], 
                 ts: today
                 };
-       // osvControls.osvYear.setValue(today.getYear());
+        osvControls.osvYear.setValue(today.getFullYear());
         osvControls.osvMonth.setValue(today.getMonth() + 1);
         osvControls.osvDay.setValue(today.getDate());
         osvControls.osvHour.setValue(today.getHours());
