@@ -314,7 +314,25 @@ function createControls()
             timeControls.minuteControl.setValue(osvControls.osvMinute.getValue());
             timeControls.secondControl.setValue(osvControls.osvSecond.getValue());
         }}, 'setClockFromOsv').name('Set From OSV');
+    timeFolder.add({setClockFromTle:function()
+        {
+            timeControls.enableClock.setValue(0);
+            const tleYear = parseInt("20" + guiControls.tleYear);
+            timeControls.yearControl.setValue(tleYear);
+            let tleDate = new Date(tleYear, 0, 0);
+            tleDate = new Date(tleDate.getTime() + guiControls.tleDay * 86400.0 * 1000.0);
+            const utcDiffMinutes = tleDate.getTimezoneOffset();
+            tleDate = new Date(tleDate.getTime() - utcDiffMinutes * 60.0 * 1000.0);
 
+            console.log(tleDate);
+            console.log(guiControls.tleDay);
+            timeControls.monthControl.setValue(tleDate.getMonth() + 1);
+            timeControls.dayControl.setValue(tleDate.getDate());
+            timeControls.hourControl.setValue(tleDate.getHours());
+            timeControls.minuteControl.setValue(tleDate.getMinutes());
+            timeControls.secondControl.setValue(tleDate.getSeconds());
+        }}, 'setClockFromTle').name('Set From TLE');
+    
     const textFolder = gui.addFolder('Caption');
     textFolder.add(guiControls, 'showTargetName').name('Target Name');
     textFolder.add(guiControls, 'showLocal').name('Local Time');
