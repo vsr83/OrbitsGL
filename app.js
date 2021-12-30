@@ -137,7 +137,25 @@ function drawScene(time)
     LST = MathUtils.deg2Rad(TimeConversions.computeSiderealTime(0, JD, JT)) % 360.0;
 
     // Convert OSV to Osculating Keplerian elements.
-    ISS.kepler = Kepler.osvToKepler(ISS.osv.r, ISS.osv.v, ISS.osv.ts);
+    if (guiControls.keplerFix)
+    {
+        osvControls.source.setValue('OSV');
+
+        ISS.kepler = {a : guiControls.keplera * 1000.0, 
+            mu : 3.986004418e14,
+            ecc_norm: guiControls.keplere,
+            incl : guiControls.kepleri, 
+            Omega : guiControls.keplerOmega,
+            omega : guiControls.kepleromega, 
+            M : guiControls.keplerM, 
+            ts : today
+        };
+        ISS.kepler.b = ISS.kepler.a * Math.sqrt(1.0 - ISS.kepler.ecc_norm * ISS.kepler.ecc_norm);
+    }
+    else 
+    {
+        ISS.kepler = Kepler.osvToKepler(ISS.osv.r, ISS.osv.v, ISS.osv.ts);
+    }
 
     // Propagate OSV only if SGP4 is not used.
     if (guiControls.source === "TLE")
@@ -148,6 +166,42 @@ function drawScene(time)
     {
         // Propagate OSV using Osculating Keplerian elements.
         ISS.osvProp = Kepler.propagate(ISS.kepler, today);
+        if (guiControls.keplerFix)
+        {
+            osvControls.osvMonth.setValue(ISS.osvProp.ts.getMonth() + 1);
+            osvControls.osvDay.setValue(ISS.osvProp.ts.getDate());
+            osvControls.osvHour.setValue(ISS.osvProp.ts.getHours());
+            osvControls.osvMinute.setValue(ISS.osvProp.ts.getMinutes());
+            osvControls.osvSecond.setValue(ISS.osvProp.ts.getSeconds());
+            osvControls.osvX.setValue(ISS.osvProp.r[0] * 0.001);
+            osvControls.osvY.setValue(ISS.osvProp.r[1] * 0.001);
+            osvControls.osvZ.setValue(ISS.osvProp.r[2] * 0.001);
+            osvControls.osvVx.setValue(ISS.osvProp.v[0]);
+            osvControls.osvVy.setValue(ISS.osvProp.v[1]);
+            osvControls.osvVz.setValue(ISS.osvProp.v[2]);
+        }
+    }
+    if (!guiControls.keplerFix)
+    {
+        function toNonNegative(angle) 
+        {
+            if (angle < 0)
+            {
+                return angle + 360;
+            }
+            else
+            {
+                return angle;
+            }
+        }
+    
+        const keplerUpdated = Kepler.osvToKepler(ISS.osvProp.r, ISS.osvProp.v, ISS.osvProp.ts);
+        keplerControls.keplere.setValue(keplerUpdated.ecc_norm);
+        keplerControls.keplera.setValue(keplerUpdated.a * 0.001);
+        keplerControls.kepleri.setValue(keplerUpdated.incl);
+        keplerControls.keplerOmega.setValue(toNonNegative(keplerUpdated.Omega));
+        keplerControls.kepleromega.setValue(toNonNegative(keplerUpdated.omega));
+        keplerControls.keplerM.setValue(toNonNegative(keplerUpdated.M));
     }
 
     // Compute updated keplerian elements from the propagated OSV.
