@@ -400,7 +400,7 @@ function createControls()
 
     const keplerFolder = gui.addFolder('Keplerian Elements');
     keplerControls.keplerFix = keplerFolder.add(guiControls, 'keplerFix').name('Override');
-    keplerControls.keplere = keplerFolder.add(guiControls, 'keplere', 0.0, 0.99, 0.0001).name('Eccentricity');
+    keplerControls.keplere = keplerFolder.add(guiControls, 'keplere', 0.0, 0.95, 0.0001).name('Eccentricity');
     keplerControls.keplera = keplerFolder.add(guiControls, 'keplera', 1.0, 1e5, 0.1).name('Semimajor Axis');
     keplerControls.kepleri = keplerFolder.add(guiControls, 'kepleri', 0.0, 180.0, 0.001).name('Inclination');
     keplerControls.keplerOmega = keplerFolder.add(guiControls, 'keplerOmega', 0.0, 359.99, 0.001).name('Long. Asc. Node');
