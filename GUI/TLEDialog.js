@@ -201,3 +201,62 @@ function createTLE()
 
     return line0 + '\n' + line1 + '\n' + line2;
 }
+
+/**
+ * Create TLE from OSV.
+ */
+function createTLEOSV()
+{
+    function toNonNegative(angle) 
+    {
+        if (angle < 0)
+        {
+            return angle + 360;
+        }
+        else
+        {
+            return angle;
+        }
+    }
+
+    console.log('createTLEOSV');
+    const osvProp = ISS.osvProp;
+    const ts = osvProp.ts;
+
+    console.log(osvProp);
+
+    const kepler = Kepler.osvToKepler(osvProp.r, osvProp.v, ts);
+    console.log(kepler);
+
+    const utcDiffMinutes = ts.getTimezoneOffset();
+    const epochYear = ts.getUTCFullYear();
+    const yearStart = new Date(epochYear, 0, 0);
+    let diff = ts - yearStart;
+    diff += 1000 * 60 * utcDiffMinutes;
+    const msPerDay = 86400.0 * 1000.0;
+    const epochDay = diff / msPerDay;
+
+    console.log('Computing TLE:');
+    console.log('Epoch Year: ' + epochYear);
+    console.log('Epoch Day: ' + epochDay);
+    tleControls.tleLaunchYear.setValue('00');
+    tleControls.tleLaunchNumber.setValue('000');
+    tleControls.tlePiece.setValue('A__');
+    tleControls.tleYear.setValue(epochYear.toString().substring(2, 4));
+    tleControls.tleDay.setValue(epochDay);
+    tleControls.tleBalDer.setValue('_.00000000');
+    tleControls.tleDragTerm.setValue('_00000-1');
+    tleControls.tleElemSetNumber.setValue('_999');
+    tleControls.tleCatalogNo.setValue('00000');
+    tleControls.tleInclination.setValue(kepler.incl);
+    tleControls.tleRA.setValue(toNonNegative(kepler.Omega));
+    tleControls.tleEccentricity.setValue(kepler.ecc_norm);
+    tleControls.tleArgPerigee.setValue(toNonNegative(kepler.omega));
+    tleControls.tleMeanAnomaly.setValue(toNonNegative(kepler.M));
+
+    const period = Kepler.computePeriod(kepler.a, kepler.mu);
+    const meanMotion = 86400.0 / period;
+    tleControls.tleMeanMotion.setValue(meanMotion);
+
+    tleControls.tleRev.setValue('00000');
+}

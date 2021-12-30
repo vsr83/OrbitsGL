@@ -187,6 +187,10 @@ function createControls()
             TLEinput.focus();
             TLEinput.value = lines;
         }
+
+        this.createTLEOSV = function() {
+            createTLEOSV();
+        }
     }
 
     /**
@@ -302,6 +306,7 @@ function createControls()
     }}, 'reset').name('Reset Time');
     timeFolder.add({setClockFromOsv:function()
         {
+            timeControls.enableClock.setValue(0);
             timeControls.yearControl.setValue(osvControls.osvYear.getValue());
             timeControls.monthControl.setValue(osvControls.osvMonth.getValue());
             timeControls.dayControl.setValue(osvControls.osvDay.getValue());
@@ -331,6 +336,7 @@ function createControls()
  
     const tleFolder = gui.addFolder('Two-Line Element');
     tleControls.createTLE = tleFolder.add(guiControls, 'createTLE').name('Export TLE');
+    tleControls.createTLEOSV = tleFolder.add(guiControls, 'createTLEOSV').name('Fill from OSV');
     tleControls.tleSatName = tleFolder.add(guiControls, 'tleSatName').name('Satellite Name');
     tleControls.tleLaunchYear = tleFolder.add(guiControls, 'tleLaunchYear').name('Launch Year');
     tleControls.tleLaunchNumber = tleFolder.add(guiControls, 'tleLaunchNumber').name('Launch Number');
