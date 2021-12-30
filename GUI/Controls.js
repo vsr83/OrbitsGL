@@ -7,6 +7,7 @@ var tleControls = {};
 var timeControls = {};
 var cameraControls = {};
 var frameControls = {};
+var keplerControls = {};
 
 /**
  * Create GUI controls.
@@ -120,6 +121,14 @@ function createControls()
         this.tleMeanMotion = "15.49048054";
         this.tleRev = "31781";
 
+        this.keplere = 0.0;
+        this.keplera = 6800;
+        this.kepleri= 0.0;
+        this.keplerOmega = 0.0;
+        this.kepleromega= 0.0;
+        this.keplerM = 0.0;
+        this.keplerFix = false;
+
         // Initialize OSV from a string.
         this.insertOSV = function() {
             var osvIn = prompt("Orbit State Vector", 
@@ -215,6 +224,7 @@ function createControls()
     osvControls.insertOSV = gui.add(guiControls, 'insertOSV').name('Insert OSV');
     osvControls.exportOSV = gui.add(guiControls, 'exportOSV').name('Export OSV');
     osvControls.source = gui.add(guiControls, 'source', ['Telemetry', 'OEM', 'TLE', 'OSV']).name('Data Source'); 
+    timeControls.enableClock = gui.add(guiControls, 'enableClock').name('Enable Clock');
 
     const displayFolder = gui.addFolder('Display');
     displayFolder.add(guiControls, 'enableGrid').name('Grid Lines');
@@ -274,7 +284,6 @@ function createControls()
     cameraFolder.add(guiControls, 'upLat', -90, 90, 1).name('Latitude Up');
      
     const timeFolder = gui.addFolder('Time');
-    timeControls.enableClock = timeFolder.add(guiControls, 'enableClock').name('Enable Clock');
     timeControls.warpSeconds = timeFolder.add(guiControls, 'warpSeconds', -60, 60, 1).onChange(configureTime).name('Warp Size'); 
     timeFolder.add(guiControls, 'timeWarp').name('Time Warp');
     timeControls.yearControl = timeFolder.add(guiControls, 'dateYear', 1980, 2040, 1).onChange(configureTime).name('Year');
@@ -388,7 +397,16 @@ function createControls()
     osvControls.osvVx = osvFolder.add(guiControls, 'osvVx', -100000, 100000, 0.000001).name('Vx (m/s)');
     osvControls.osvVy = osvFolder.add(guiControls, 'osvVy', -100000, 100000, 0.000001).name('Vy (m/s)');
     osvControls.osvVz = osvFolder.add(guiControls, 'osvVz', -100000, 100000, 0.000001).name('Vz (m/s)');
-      
+
+    const keplerFolder = gui.addFolder('Keplerian Elements');
+    keplerControls.keplerFix = keplerFolder.add(guiControls, 'keplerFix').name('Override');
+    keplerControls.keplere = keplerFolder.add(guiControls, 'keplere', 0.0, 0.99, 0.0001).name('Eccentricity');
+    keplerControls.keplera = keplerFolder.add(guiControls, 'keplera', 1.0, 1e5, 0.1).name('Semimajor Axis');
+    keplerControls.kepleri = keplerFolder.add(guiControls, 'kepleri', 0.0, 180.0, 0.001).name('Inclination');
+    keplerControls.keplerOmega = keplerFolder.add(guiControls, 'keplerOmega', 0.0, 359.99, 0.001).name('Long. Asc. Node');
+    keplerControls.kepleromega = keplerFolder.add(guiControls, 'kepleromega', 0.0, 359.99, 0.001).name('Arg. Perigee');
+    keplerControls.keplerM = keplerFolder.add(guiControls, 'keplerM', 0.0, 359.99, 0.001).name('Mean Anomaly');
+    
     gui.add(guiControls, 'GitHub');
 }
  
