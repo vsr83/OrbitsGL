@@ -118,8 +118,8 @@
  
          if (guiControls.showIssLocation)
          {
-             caption = caption + "Lat, Lon (deg): " + ISS.lat.toFixed(5) + " " + ISS.lon.toFixed(5) + "<br>";
-             caption = caption + "Altitude (m): " + ISS.alt + "<br>";
+             caption = caption + "Lat, Lon (deg): " + ISS.lat.toFixed(2) + " " + ISS.lon.toFixed(2) + "<br>";
+             caption = caption + "Altitude (m): " + ISS.alt.toFixed(0) + "<br>";
          }
  
          if (ISS.kepler.a != 0 && guiControls.showIssElements)
