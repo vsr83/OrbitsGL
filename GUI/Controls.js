@@ -229,7 +229,7 @@ function createControls()
     const displayFolder = gui.addFolder('Display');
     displayFolder.add(guiControls, 'enableGrid').name('Grid Lines');
     displayFolder.add(guiControls, 'enableMap').name('Map Lines');
-    displayFolder.add(guiControls, 'enableTextures').name('Sun');
+    displayFolder.add(guiControls, 'enableTextures').name('Textures');
     displayFolder.add(guiControls, 'enableVisibility').name('Show Visibility');
     displayFolder.add(guiControls, 'enableSubSolar').name('Subsolar Point');
     displayFolder.add(guiControls, 'enableOrbit').name('Orbit Lines');
