@@ -27,6 +27,7 @@ function createControls()
         this.enableSun = true;
         this.enableMoon = true;
         this.enableSubSolar = false;
+        this.enableList = false;
         this.locationLon = 24.66;
         this.locationLat = 60.21;
         this.gridLonResolution = 30;
@@ -234,6 +235,7 @@ function createControls()
     displayFolder.add(guiControls, 'enableSubSolar').name('Subsolar Point');
     displayFolder.add(guiControls, 'enableOrbit').name('Orbit Lines');
     displayFolder.add(guiControls, 'enableSun').name('Sun Orbit');
+    displayFolder.add(guiControls, 'enableList').name('Show all Active');
     //displayFolder.add(guiControls, 'enableMoon').name('Show Moon');
     const lonControl = displayFolder.add(guiControls, 'gridLonResolution', 1, 180, 1)
     .name('Grid Lon. Resolution')

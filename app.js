@@ -3,6 +3,7 @@
 var gl = null;
 var earthShaders = null;
 var lineShaders = null;
+var pointShaders = null;
 
 // SGP4 test:
 var tleLine1 = '1 25544U 98067A   21356.70730882  .00006423  00000+0  12443-3 0  9993',
@@ -49,6 +50,39 @@ earthShaders.init("textures/8k_earth_daymap.jpg", "textures/8k_earth_nightmap.jp
 lineShaders = new LineShaders(gl);
 lineShaders.init();
 
+pointShaders = new PointShaders(gl);
+pointShaders.init();
+
+var satellites = [];
+
+var tleHTTP = new XMLHttpRequest();
+tleHTTP.onreadystatechange = function()
+{
+    console.log("readyState: " + this.readyState);
+    console.log("status:     " + this.status);
+
+    if (this.readyState == 4 && this.status == 200)
+    {
+        //console.log(this.responseText);
+        const lines = this.responseText.split("\n");
+        const numElem = lines.length/3;
+
+        for (let indElem = 0; indElem < Math.floor(numElem) - 1; indElem++)
+        {
+            const title = lines[indElem * 3];
+            const tleLine1 = lines[indElem * 3 + 1];
+            const tleLine2 = lines[indElem * 3 + 2];
+            const satrec = satellite.twoline2satrec(tleLine1, tleLine2);
+
+            satellites.push(satrec);
+            console.log(indElem + "/" + numElem);
+        }
+    }
+}
+tleHTTP.open("GET", "json/active.txt", true);
+tleHTTP.send();
+
+
 requestAnimationFrame(drawScene);
  
 
@@ -67,6 +101,9 @@ function drawScene(time)
     canvas.height = document.documentElement.clientHeight;
 
     gl.useProgram(earthShaders.program);
+
+    // Avoid change to the list during the execution of the method.
+    const enableList = guiControls.enableList;
 
     // Compute Julian time.
     let dateNow = new Date();
@@ -111,6 +148,29 @@ function drawScene(time)
     // Use latest telemetry only if enabled. Then, the telemetry set from the UI controls is not
     // overwritten below.
     ISS.osv = createOsv(today);
+
+    let osvSatListJ2000 = [];
+    if (enableList)
+    {
+        for (let indSat = 0; indSat < satellites.length; indSat++)
+        {
+            const sat = satellites[indSat];
+            const positionAndVelocity = satellite.propagate(sat, today);
+            // The position_velocity result is a key-value pair of ECI coordinates.
+            // These are the base results from which all other coordinates are derived.
+            const posEci = positionAndVelocity.position;
+            const velEci = positionAndVelocity.velocity;
+
+            if (typeof posEci !== 'undefined')
+            {
+                //console.log(posEci);
+                let osvSat = {r : [posEci.x * 1000.0, posEci.y * 1000.0, posEci.z * 1000.0], 
+                            v : [velEci.x * 1000.0, velEci.y * 1000.0, velEci.z * 1000.0], 
+                            ts: today};
+                osvSatListJ2000.push(osvSat);
+            }
+        }
+    }
 
     // Compute Julian date and time:
     const julianTimes = TimeConversions.computeJulianTime(today);
@@ -208,12 +268,35 @@ function drawScene(time)
     // Compute updated keplerian elements from the propagated OSV.
     let kepler_updated = ISS.kepler;// Kepler.osvToKepler(ISS.osvProp.r, ISS.osvProp.v, ISS.osvProp.ts);
 
+    let osvSatListECEF = [];
+    let pointsOut = [];
     // Convert propagated OSV from J2000 to ECEF frame.
-    let osv_ECEF = Frames.osvJ2000ToECEF(ISS.osvProp);
-    ISS.r_ECEF = osv_ECEF.r;
-    ISS.v_ECEF = osv_ECEF.v;
-    ISS.r_J2000 = ISS.osvProp.r;
-    ISS.v_J2000 = ISS.osvProp.v;
+    if (enableList)
+    {
+        let osv_ECEF = Frames.osvJ2000ToECEF(ISS.osvProp);
+        ISS.r_ECEF = osv_ECEF.r;
+        ISS.v_ECEF = osv_ECEF.v;
+        ISS.r_J2000 = ISS.osvProp.r;
+        ISS.v_J2000 = ISS.osvProp.v;
+
+        for (let indSat = 0; indSat < osvSatListJ2000.length; indSat++)
+        {
+            osvSatListECEF.push(Frames.osvJ2000ToECEF(osvSatListJ2000[indSat], nutPar));
+
+            const rJ2000 = osvSatListJ2000[indSat].r;
+            const rECEF = osvSatListECEF[indSat].r;
+
+            if (guiControls.frame === 'J2000')
+            {
+                pointsOut.push(MathUtils.vecmul(rJ2000, 0.001));
+            }
+            else 
+            {
+                pointsOut.push(MathUtils.vecmul(rECEF, 0.001));
+            }
+        }
+        pointShaders.setGeometry(pointsOut);
+    }
 
     // Extract the coordinates on the WGS84 ellipsoid.
     let wgs84 = Coordinates.cartToWgs84(ISS.r_ECEF);
@@ -246,6 +329,11 @@ function drawScene(time)
     if (guiControls.enableOrbit)
     {
         drawOrbit(today, matrix, kepler_updated, nutPar);
+    }
+
+    if (enableList)
+    {
+       pointShaders.draw(matrix);
     }
 
     if (guiControls.enableSun)
