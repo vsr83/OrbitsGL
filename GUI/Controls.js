@@ -39,6 +39,8 @@ function createControls()
         this.colorGrid = [80, 80, 80];
         this.colorMap = [80, 80, 120];
         this.colorOrbit = [127, 127, 127];
+        this.colorSatellite = [200, 200, 200];
+        this.activeScale = 2.0;
 
         //this.enableLocation = false;
         this.displayTwilight = true;
@@ -253,6 +255,12 @@ function createControls()
     displayFolder.add(guiControls, 'orbitsAfter', 0, 5, 0.1).name('Orbits After');
     displayFolder.add(guiControls, 'orbitPoints', 10, 1000, 1).name('Points per Orbit');
     displayFolder.add(guiControls, 'satelliteScale', 0.1, 10.0, 0.1).name('Satellite Scaling');
+    displayFolder.add(guiControls, 'activeScale', 0.1, 10.0, 0.1).name('Point Size').onChange(
+        function() 
+        {
+            pointShaders.pointSize = guiControls.activeScale;
+        }
+    );
     displayFolder.addColor(guiControls, 'colorGrid').name('Grid Color')
     .onChange(function()
     {
@@ -269,6 +277,11 @@ function createControls()
     .onChange(function()
     {
         lineShaders.colorOrbit = guiControls.colorOrbit;
+    });
+    displayFolder.addColor(guiControls, 'colorSatellite').name('Point Color')
+    .onChange(function()
+    {
+        pointShaders.colorPoint = guiControls.colorSatellite;
     });
  
     const cameraFolder = gui.addFolder('Camera');

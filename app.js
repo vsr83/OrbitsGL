@@ -75,7 +75,6 @@ tleHTTP.onreadystatechange = function()
             const satrec = satellite.twoline2satrec(tleLine1, tleLine2);
 
             satellites.push(satrec);
-            console.log(indElem + "/" + numElem);
         }
     }
 }

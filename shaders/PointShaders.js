@@ -12,7 +12,8 @@ class PointShaders
     constructor(gl)
     {
         this.gl = gl;
-        this.colorOrbit = [200, 200, 200];
+        this.colorPoint = [200, 200, 200];
+        this.pointSize = 2.0;
 
         this.vertShaderLine = `#version 300 es
             // an attribute is an input (in) to a vertex shader.
@@ -22,6 +23,7 @@ class PointShaders
 
             // A matrix to transform the positions by
             uniform mat4 u_matrix;
+            uniform float pointSize;
 
             // a varying the color to the fragment shader
             out vec4 v_color;
@@ -31,7 +33,7 @@ class PointShaders
             {
                 // Multiply the position by the matrix.
                 gl_Position = u_matrix * a_position;
-                gl_PointSize = 2.0;
+                gl_PointSize = pointSize;
 
                 // Pass the color to the fragment shader.
                 v_color = a_color;
@@ -102,6 +104,8 @@ class PointShaders
         gl.useProgram(this.program);
         gl.bindVertexArray(this.vertexArray);
         gl.uniformMatrix4fv(this.matrixLocation, false, viewMatrix);
+        const pointSizeLocation = gl.getUniformLocation(this.program, "pointSize");
+        gl.uniform1f(pointSizeLocation, this.pointSize);
 
         // Draw the grid.
         gl.drawArrays(gl.POINTS, 0, this.gridLines * 2);  
@@ -141,9 +145,9 @@ class PointShaders
         for (let indPoint = 0; indPoint < this.gridLines * 2; indPoint++)
         {
             const startIndex = indPoint * 3;
-            colorArray[startIndex] = this.colorOrbit[0];
-            colorArray[startIndex + 1] = this.colorOrbit[1];
-            colorArray[startIndex + 2] = this.colorOrbit[2];
+            colorArray[startIndex] = this.colorPoint[0];
+            colorArray[startIndex + 1] = this.colorPoint[1];
+            colorArray[startIndex + 2] = this.colorPoint[2];
         }
         gl.bindBuffer(gl.ARRAY_BUFFER, this.colorBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, colorArray, gl.STATIC_DRAW);
