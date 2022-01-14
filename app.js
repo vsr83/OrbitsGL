@@ -271,14 +271,14 @@ function drawScene(time)
     let osvSatListECEF = [];
     let pointsOut = [];
     // Convert propagated OSV from J2000 to ECEF frame.
+    let osv_ECEF = Frames.osvJ2000ToECEF(ISS.osvProp);
+    ISS.r_ECEF = osv_ECEF.r;
+    ISS.v_ECEF = osv_ECEF.v;
+    ISS.r_J2000 = ISS.osvProp.r;
+    ISS.v_J2000 = ISS.osvProp.v;
+
     if (enableList)
     {
-        let osv_ECEF = Frames.osvJ2000ToECEF(ISS.osvProp);
-        ISS.r_ECEF = osv_ECEF.r;
-        ISS.v_ECEF = osv_ECEF.v;
-        ISS.r_J2000 = ISS.osvProp.r;
-        ISS.v_J2000 = ISS.osvProp.v;
-
         for (let indSat = 0; indSat < osvSatListJ2000.length; indSat++)
         {
             osvSatListECEF.push(Frames.osvJ2000ToECEF(osvSatListJ2000[indSat], nutPar));
