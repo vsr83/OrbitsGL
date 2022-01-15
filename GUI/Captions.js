@@ -53,7 +53,18 @@ function updateCaptions(rA, decl, lonlat, rAMoon, declMoon, lonlatMoon, today, J
         warningContainer.style.visibility = "hidden";
         warningText.style.visibility = "hidden";
     }
- 
+
+    if (guiControls.enableList)
+    {
+        if (satellites.length == 0)
+        {
+            caption = caption + "Click <b>Insert TLE List</b> to add.<br>";
+        }
+        else
+        {
+            caption = caption + "Tracking: " + satellites.length + " satellites<br>";
+        }
+    }
     if (guiControls.showLocal)
     {
         caption = caption + "Local: " + today.toString() + "<br>";

@@ -181,6 +181,14 @@ function createControls()
             TLEinput.focus();
         }
 
+        // Initialize TLE from a string.
+        this.insertList = function() {
+            const listContainer = document.getElementById('TLEListcontainer');
+            listContainer.style.visibility = "visible";
+            const TLEinput = document.getElementById('TLEListinput');
+            TLEinput.focus();
+        }
+
         // Export OSV into a string.
         this.exportOSV = function() {
             const osv = ISS.osvProp;
@@ -224,6 +232,7 @@ function createControls()
 
     osvControls.targetName = gui.add(guiControls, 'targetName').name('Target Name');
     osvControls.insertTLE = gui.add(guiControls, 'insertTLE').name('Insert TLE');
+    osvControls.insertList = gui.add(guiControls, 'insertList').name('Insert TLE List');
     osvControls.insertOSV = gui.add(guiControls, 'insertOSV').name('Insert OSV');
     osvControls.exportOSV = gui.add(guiControls, 'exportOSV').name('Export OSV');
     osvControls.source = gui.add(guiControls, 'source', ['Telemetry', 'OEM', 'TLE', 'OSV']).name('Data Source'); 
@@ -237,7 +246,7 @@ function createControls()
     displayFolder.add(guiControls, 'enableSubSolar').name('Subsolar Point');
     displayFolder.add(guiControls, 'enableOrbit').name('Orbit Lines');
     displayFolder.add(guiControls, 'enableSun').name('Sun Orbit');
-    displayFolder.add(guiControls, 'enableList').name('Show all Active');
+    displayFolder.add(guiControls, 'enableList').name('Show List');
     //displayFolder.add(guiControls, 'enableMoon').name('Show Moon');
     const lonControl = displayFolder.add(guiControls, 'gridLonResolution', 1, 180, 1)
     .name('Grid Lon. Resolution')

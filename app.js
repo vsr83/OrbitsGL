@@ -55,33 +55,6 @@ pointShaders.init();
 
 var satellites = [];
 
-var tleHTTP = new XMLHttpRequest();
-tleHTTP.onreadystatechange = function()
-{
-    console.log("readyState: " + this.readyState);
-    console.log("status:     " + this.status);
-
-    if (this.readyState == 4 && this.status == 200)
-    {
-        //console.log(this.responseText);
-        const lines = this.responseText.split("\n");
-        const numElem = lines.length/3;
-
-        for (let indElem = 0; indElem < Math.floor(numElem) - 1; indElem++)
-        {
-            const title = lines[indElem * 3];
-            const tleLine1 = lines[indElem * 3 + 1];
-            const tleLine2 = lines[indElem * 3 + 2];
-            const satrec = satellite.twoline2satrec(tleLine1, tleLine2);
-
-            satellites.push(satrec);
-        }
-    }
-}
-tleHTTP.open("GET", "json/active.txt", true);
-tleHTTP.send();
-
-
 requestAnimationFrame(drawScene);
  
 
