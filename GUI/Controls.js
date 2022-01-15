@@ -182,6 +182,12 @@ function createControls()
             TLEinput.focus();
         }
 
+        // Select TLE from a list.
+        this.selectTLE = function() {
+            const SelectContainer = document.getElementById('TLESelectcontainer');            
+            SelectContainer.style.visibility = "visible";
+        }
+
         // Initialize TLE from a string.
         this.insertList = function() {
             const listContainer = document.getElementById('TLEListcontainer');
@@ -234,6 +240,7 @@ function createControls()
     osvControls.targetName = gui.add(guiControls, 'targetName').name('Target Name');
     osvControls.insertTLE = gui.add(guiControls, 'insertTLE').name('Insert TLE');
     osvControls.insertList = gui.add(guiControls, 'insertList').name('Insert TLE List');
+    osvControls.selectTLE = gui.add(guiControls, 'selectTLE').name('Select TLE');
     osvControls.insertOSV = gui.add(guiControls, 'insertOSV').name('Insert OSV');
     osvControls.exportOSV = gui.add(guiControls, 'exportOSV').name('Export OSV');
     osvControls.source = gui.add(guiControls, 'source', ['Telemetry', 'OEM', 'TLE', 'OSV']).name('Data Source'); 

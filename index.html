@@ -22,6 +22,14 @@
             <button id="TLEListEnter">Enter</button>
             <button id="TLEListCancel">Cancel</button>
         </div>
+        <div id="TLESelectcontainer">
+            <label for="TLESelectinput">Select TLE from the list of satellites below:</label>
+            <br>
+            <select id="TLESelectlist" size="0">
+            </select>
+            <button id="TLESelectEnter">Select</button>
+            <button id="TLESelectCancel">Cancel</button>
+        </div>
     </div>
 
     <script src="ISSLive/lightstreamer.min.js"></script>
@@ -41,6 +49,7 @@
     <script src="GUI/OrbitControls.js"></script>
     <script src="GUI/TLEDialog.js"></script>
     <script src="GUI/ListDialog.js"></script>
+    <script src="GUI/SelectDialog.js"></script>
 
     <script src="imports/satellite.min.js"></script>
     <script src="imports/m4.js"></script>

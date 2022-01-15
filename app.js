@@ -54,6 +54,8 @@ pointShaders = new PointShaders(gl);
 pointShaders.init();
 
 var satellites = [];
+var satLines = [];
+var satNameToIndex = [];
 
 requestAnimationFrame(drawScene);
  
