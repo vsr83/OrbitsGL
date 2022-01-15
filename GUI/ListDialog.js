@@ -22,6 +22,7 @@ ListEnter.onclick = function()
 
         satellites.push(satrec);
     }
+    displayControls.enableList.setValue(true);
 }
 
 ListCancel.onclick = function() 

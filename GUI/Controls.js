@@ -3,6 +3,7 @@ var guiControls = null;
 
 // Hold OSV controls.
 var osvControls = {};
+var displayControls = {};
 var tleControls = {};
 var timeControls = {};
 var cameraControls = {};
@@ -239,14 +240,14 @@ function createControls()
     timeControls.enableClock = gui.add(guiControls, 'enableClock').name('Enable Clock');
 
     const displayFolder = gui.addFolder('Display');
-    displayFolder.add(guiControls, 'enableGrid').name('Grid Lines');
-    displayFolder.add(guiControls, 'enableMap').name('Map Lines');
-    displayFolder.add(guiControls, 'enableTextures').name('Textures');
-    displayFolder.add(guiControls, 'enableVisibility').name('Show Visibility');
-    displayFolder.add(guiControls, 'enableSubSolar').name('Subsolar Point');
-    displayFolder.add(guiControls, 'enableOrbit').name('Orbit Lines');
-    displayFolder.add(guiControls, 'enableSun').name('Sun Orbit');
-    displayFolder.add(guiControls, 'enableList').name('Show List');
+    displayControls.enableGrid = displayFolder.add(guiControls, 'enableGrid').name('Grid Lines');
+    displayControls.enableMap = displayFolder.add(guiControls, 'enableMap').name('Map Lines');
+    displayControls.enableTextures = displayFolder.add(guiControls, 'enableTextures').name('Textures');
+    displayControls.enableVisibility = displayFolder.add(guiControls, 'enableVisibility').name('Show Visibility');
+    displayControls.enableSubSolar = displayFolder.add(guiControls, 'enableSubSolar').name('Subsolar Point');
+    displayControls.enableOrbit = displayFolder.add(guiControls, 'enableOrbit').name('Orbit Lines');
+    displayControls.enableSun = displayFolder.add(guiControls, 'enableSun').name('Sun Orbit');
+    displayControls.enableList = displayFolder.add(guiControls, 'enableList').name('Show List');
     //displayFolder.add(guiControls, 'enableMoon').name('Show Moon');
     const lonControl = displayFolder.add(guiControls, 'gridLonResolution', 1, 180, 1)
     .name('Grid Lon. Resolution')
