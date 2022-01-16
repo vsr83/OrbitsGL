@@ -31,6 +31,10 @@ By default, initialization with an OSV leads the propagation of orbits assuming 
 
 Orbit can be initialized from TLEs via "Insert TLE" from the main menu. The orbit will be propagated using the SGP4 propagator. TLEs for unclassified satellites can be downloaded from [CelesTrak](https://celestrak.com/NORAD/elements/).
 
+## Two-Line Element (TLE) Lists
+
+Arbitrary number of satellites can be visualized as points simultaneously via specification of a list of TLEs using "Insert TLE List" from the main menu. Thereafter, the active TLE can be selected via "Select TLE".
+
 ## Keplerian Elements
 
 Orbit can be initialized from Keplerian Elements from the "Keplerian Elements" folder via selection of the Override checkbox. This will generate the current OSV. The OSV can be converted to a TLE as described above.
