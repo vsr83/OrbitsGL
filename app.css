@@ -175,3 +175,13 @@ body {
       visibility:  hidden;
     }
   
+    a:link 
+    {
+      color: red;
+    }
+    
+    a:visited 
+    {
+      color: red;
+    }
+      
