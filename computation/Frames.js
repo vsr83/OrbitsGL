@@ -41,13 +41,30 @@ Frames.osvJ2000ToECEF = function(osv_J2000, nutPar)
     const v_rot = MathUtils.rotZ(vCEP, -LST);
     const omega = (Math.PI / 180.0) * dLSTdt;
 
-    const mat_11 = omega * -MathUtils.sind(LST);
-    const mat_12 = omega * MathUtils.cosd(LST);
-    const mat_21 = omega * -MathUtils.cosd(LST);
-    const mat_22 = omega * -MathUtils.sind(LST);
+    const mat_11 = MathUtils.cosd(LST);
+    const mat_12 = MathUtils.sind(LST);
+    const mat_21 = -MathUtils.sind(LST);
+    const mat_22 = MathUtils.cosd(LST);
 
-    const v_ECEF_x = v_rot[0] + mat_11 * osv_CEP.r[0] + mat_12 * osv_CEP.r[1];
-    const v_ECEF_y = v_rot[1] + mat_21 * osv_CEP.r[0] + mat_22 * osv_CEP.r[1];
+    // Alternative expression for the GMST is \sum_{i=0}^3 k_i MJD^i.
+    const k_0 = 100.460618375;
+    const k_1 = 360.985647366;
+    const k_2 = 2.90788e-13;
+    const k_3 = -5.3016e-22;
+    const MJD = julian.JT - 2451544.5;
+
+    // Compute time-derivative of the GAST to convert velocities:
+    const  dGASTdt = (1/86400.0) * (k_1 + 2*k_2*MJD + 3*k_3*MJD*MJD);
+    const dRdt_11 = -dGASTdt * (Math.PI/180.0) * MathUtils.sind(LST);
+    const dRdt_12 =  dGASTdt * (Math.PI/180.0) * MathUtils.cosd(LST);
+    const dRdt_21 = -dGASTdt * (Math.PI/180.0) * MathUtils.cosd(LST);
+    const dRdt_22 = -dGASTdt * (Math.PI/180.0) * MathUtils.sind(LST);
+    //console.log(julian.JT + " " + LST);
+
+    const v_ECEF_x = mat_11 * osv_CEP.v[0] + mat_12 * osv_CEP.v[1]
+                    + dRdt_11 * osv_ECEF.r[0] + dRdt_12 * osv_ECEF.r[1];
+    const v_ECEF_y = mat_21 * osv_CEP.v[0] + mat_22 * osv_CEP.v[1]
+                    + dRdt_21 * osv_ECEF.r[0] + dRdt_22 * osv_ECEF.r[1];
     const v_ECEF_z = v_rot[2];
 
     osv_ECEF.v = [v_ECEF_x, v_ECEF_y, v_ECEF_z];
