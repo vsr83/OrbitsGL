@@ -93,11 +93,17 @@ TimeConversions.computeSiderealTime = function(longitude, JD, JT)
     // GMST(A.34)
     const GMST = 1.002737909350795 * UT1 + theta_G0;
 
-    // The equinox equation (A.37) for GAST term. 
+    // The equinox equation (A.37) for GAST term contains a sign error. The original formula
+    // in terms of the Nutation Matrix corresponds to:
+    //    atand(-cosd(eps + deps)*sind(dpsi) / cosd(dpsi)),
+    // which is approximately equal to -dpsi * cosd(eps + deps). However, the classical equation
+    // of the equinoxes is:
+    //    dpsi * cosd(eps + deps).
+
     const nutTerms = Nutation.nutationTerms(T);        
     const N11 = MathUtils.cosd(nutTerms.dpsi);
     const N12 = -MathUtils.cosd(nutTerms.eps) * MathUtils.sind(nutTerms.dpsi);
-    const GAST = (GMST + MathUtils.atand(N12 / N11) + longitude) % 360.0;
+    const GAST = (GMST - MathUtils.atand(N12 / N11) + longitude) % 360.0;
 
     return GAST;
 }
