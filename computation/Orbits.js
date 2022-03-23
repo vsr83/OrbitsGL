@@ -77,13 +77,16 @@ class Orbit
         {
             iterationCount++;
 
+            eA -= (eA - e * Math.sin(eA) - M) / (1 - e * Math.cos(eA));
+            error = Math.abs(Math.sin(M) - Math.sin(eA - e * Math.sin(eA))) + 
+                    Math.abs(Math.cos(M) - Math.cos(eA - e * Math.sin(eA)));
+
             if (iterationCount > maxIterations)
             {
                 // TODO: throw exception
+                console.error('failed to converge ' + error);
+                return this.limitAngle(eA);
             }
-
-            eA -= (eA - e * Math.sin(eA) - M) / (1 - e * Math.cos(eA));
-            error = Math.abs(eA - e * Math.sin(eA) - M);
         }
 
         // Iteration successful.
@@ -162,7 +165,6 @@ class Orbit
 
         // Distance between the sun and the planet.
         const distance = params.a * (1.0 - params.e * Math.cos(E));
-
         const coordEc = Coordinates.rotateCartZ(
             Coordinates.rotateCartX(
                 Coordinates.rotateCartZ({x : distance, y : 0, z : 0}, omega + f), 
