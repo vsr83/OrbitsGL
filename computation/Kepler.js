@@ -154,7 +154,7 @@ Kepler.osvToKepler = function(r, v, ts)
     kepler.E = MathUtils.atan2d(kepler.r_orbital[1] / kepler.b, kepler.r_orbital[0] / kepler.a + kepler.ecc_norm);
 
     // Mean anomaly.
-    kepler.M = kepler.E - kepler.ecc_norm * MathUtils.sind(kepler.E);
+    kepler.M = kepler.E - (180/Math.PI) * kepler.ecc_norm * MathUtils.sind(kepler.E);
 
     // Natural anomaly.
     /*let xu = (MathUtils.cosd(kepler.E) - kepler.ecc_norm) / 
