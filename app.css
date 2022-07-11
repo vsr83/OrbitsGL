@@ -58,6 +58,10 @@ body {
   outline: none;
 }*/
 
+.dg
+{
+    user-select: none;
+}
 
 #warningText
 {
