@@ -1,6 +1,7 @@
 <html>
     <head>
         <link rel="stylesheet" href="app.css">
+        <link rel="stylesheet" href="imports/autoComplete.02.min.css">
     </head>
     <body style="background: black; color: white; overflow-y: hidden; overflow-x: hidden">
 
@@ -33,7 +34,13 @@
             <button id="TLESelectCancel">Cancel</button>
         </div>
     </div>
+    <div id="autoCompleteContainer">
+        <div class="autoComplete_wrapper">
+            <input id="autoComplete" type="search" dir="ltr" spellcheck=false autocorrect="off" autocomplete="on" autocapitalize="off">
+        </div>
+    </div>
 
+    <script src="imports/autoComplete.min.js"></script>
     <script src="ISSLive/lightstreamer.min.js"></script>
     <script src="computation/Coordinates.js"></script>
     <script src="computation/Frames.js"></script>
@@ -52,6 +59,7 @@
     <script src="GUI/TLEDialog.js"></script>
     <script src="GUI/ListDialog.js"></script>
     <script src="GUI/SelectDialog.js"></script>
+    <script src="GUI/Search.js"></script>
 
     <script src="imports/satellite.min.js"></script>
     <script src="imports/m4.js"></script>

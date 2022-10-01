@@ -17,6 +17,7 @@ ListEnter.onclick = function()
     satNameToIndex = [];
     let innerHTML = "";
 
+    autoCompleteTargetList.length = 0;
     for (let indElem = 0; indElem < Math.floor(numElem); indElem++)
     {
         const title = lines[indElem * 3];
@@ -27,6 +28,7 @@ ListEnter.onclick = function()
         satellites.push(satrec);
         satLines.push([title, tleLine1, tleLine2]);
         satelliteNames.push(title);
+        autoCompleteTargetList.push(title);
         satNameToIndex[title] = indElem;
     }
     satelliteNames.sort();
@@ -36,6 +38,8 @@ ListEnter.onclick = function()
         const satName = satelliteNames[indName];
         innerHTML += '<option value="' + satName + '">' + satName + "</option>";         
     }
+
+    autoCompleteJS.data.src = satelliteNames;
 
     // IMPORTANT: For performance, the text area must be cleared.
     TLEinput.value = "";
