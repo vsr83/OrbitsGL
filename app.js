@@ -243,7 +243,6 @@ function drawScene(time)
     // Compute updated keplerian elements from the propagated OSV.
     let kepler_updated = ISS.kepler;// Kepler.osvToKepler(ISS.osvProp.r, ISS.osvProp.v, ISS.osvProp.ts);
 
-    let osvSatListECEF = [];
     let pointsOut = [];
     // Convert propagated OSV from J2000 to ECEF frame.
     let osv_ECEF = Frames.osvJ2000ToECEF(ISS.osvProp, nutPar);
@@ -256,19 +255,8 @@ function drawScene(time)
     {
         for (let indSat = 0; indSat < osvSatListJ2000.length; indSat++)
         {
-            osvSatListECEF.push(Frames.osvJ2000ToECEF(osvSatListJ2000[indSat], nutPar));
-
             const rJ2000 = osvSatListJ2000[indSat].r;
-            const rECEF = osvSatListECEF[indSat].r;
-
-            if (guiControls.frame === 'J2000')
-            {
-                pointsOut.push(MathUtils.vecmul(rJ2000, 0.001));
-            }
-            else 
-            {
-                pointsOut.push(MathUtils.vecmul(rECEF, 0.001));
-            }
+            pointsOut.push(MathUtils.vecmul(rJ2000, 0.001));
         }
         pointShaders.setGeometry(pointsOut);
     }
@@ -308,7 +296,18 @@ function drawScene(time)
 
     if (enableList)
     {
-       pointShaders.draw(matrix);
+        // Performance : It is significantly faster to perform the J2000->ECEF coordinate
+        // transformation in the vertex shader:        
+        const rotMatrixJ2000 = createRotMatrix(today, JD, JT, nutPar);
+
+        if (guiControls.frame === 'J2000')
+        {
+            pointShaders.draw(matrix);
+        }
+        else
+        {
+            pointShaders.draw(m4.multiply(matrix, m4.transpose(rotMatrixJ2000)));            
+        }
     }
 
     if (guiControls.enableSun)
@@ -320,6 +319,43 @@ function drawScene(time)
     requestAnimationFrame(drawScene);
 
     drawing = false;
+}
+
+/**
+ * Create rotation matrix for J2000 -> ECEF transformation for the point
+ * shader.
+ * 
+ * @param {*} ts 
+ *      Time stamp.
+ * @param {*} JD 
+ *      Julian day.
+ * @param {*} JT 
+ *      Julian time.
+ * @param {*} nutPar
+ *      Nutation parameters. 
+ * @returns Rotation matrix.
+ */
+function createRotMatrix(today, JD, JT, nutPar)
+{
+    const rotMatrixJ2000 = new Float32Array(16);
+    const osvVec1 = {r : [1, 0, 0], v : [0, 0, 0], JT : JT, JD : JD, ts : today};
+    const osvVec2 = {r : [0, 1, 0], v : [0, 0, 0], JT : JT, JD : JD, ts : today};
+    const osvVec3 = {r : [0, 0, 1], v : [0, 0, 0], JT : JT, JD : JD, ts : today};
+    let osvVec1_ECEF = Frames.osvJ2000ToECEF(osvVec1, nutPar);
+    let osvVec2_ECEF = Frames.osvJ2000ToECEF(osvVec2, nutPar);
+    let osvVec3_ECEF = Frames.osvJ2000ToECEF(osvVec3, nutPar);
+    rotMatrixJ2000[0] = osvVec1_ECEF.r[0];
+    rotMatrixJ2000[1] = osvVec2_ECEF.r[0];
+    rotMatrixJ2000[2] = osvVec3_ECEF.r[0];
+    rotMatrixJ2000[4] = osvVec1_ECEF.r[1];
+    rotMatrixJ2000[5] = osvVec2_ECEF.r[1];
+    rotMatrixJ2000[6] = osvVec3_ECEF.r[1];
+    rotMatrixJ2000[8] = osvVec1_ECEF.r[2];
+    rotMatrixJ2000[9] = osvVec2_ECEF.r[2];
+    rotMatrixJ2000[10]= osvVec3_ECEF.r[2];
+    rotMatrixJ2000[15] = 1;
+
+    return rotMatrixJ2000;
 }
 
 /**
