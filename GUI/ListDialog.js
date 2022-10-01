@@ -1,11 +1,11 @@
 // Handling of TLE input dialog.
 const ListEnter = document.getElementById('TLEListEnter');
 const ListCancel = document.getElementById('TLEListCancel');
+const TLEinput = document.getElementById('TLEListinput');
 
 ListEnter.onclick = function() 
 {
     const TLEcontainer = document.getElementById('TLEListcontainer');
-    const TLEinput = document.getElementById('TLEListinput');
     const TLEselectList = document.getElementById('TLESelectlist');
     TLEcontainer.style.visibility = "hidden";
     const tleIn = TLEinput.value;
@@ -36,6 +36,9 @@ ListEnter.onclick = function()
         const satName = satelliteNames[indName];
         innerHTML += '<option value="' + satName + '">' + satName + "</option>";         
     }
+
+    // IMPORTANT: For performance, the text area must be cleared.
+    TLEinput.value = "";
 
     //<option value="ISS">ISS</option>
 
