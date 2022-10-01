@@ -151,6 +151,7 @@ function drawScene(time)
     const JD = julianTimes.JD;
     const JT = julianTimes.JT;
     const T = (JT - 2451545.0)/36525.0;
+
     // Compute nutation parameters.
     const nutPar = Nutation.nutationTerms(T);
 
@@ -168,7 +169,7 @@ function drawScene(time)
 
     // Compute sidereal time perform modulo to avoid floating point accuracy issues with 32-bit
     // floats in the shader:
-    LST = MathUtils.deg2Rad(TimeConversions.computeSiderealTime(0, JD, JT)) % 360.0;
+    LST = MathUtils.deg2Rad(TimeConversions.computeSiderealTime(0, JD, JT, nutPar)) % 360.0;
 
     // Convert OSV to Osculating Keplerian elements.
     if (guiControls.keplerFix)
@@ -245,7 +246,7 @@ function drawScene(time)
     let osvSatListECEF = [];
     let pointsOut = [];
     // Convert propagated OSV from J2000 to ECEF frame.
-    let osv_ECEF = Frames.osvJ2000ToECEF(ISS.osvProp);
+    let osv_ECEF = Frames.osvJ2000ToECEF(ISS.osvProp, nutPar);
     ISS.r_ECEF = osv_ECEF.r;
     ISS.v_ECEF = osv_ECEF.v;
     ISS.r_J2000 = ISS.osvProp.r;
@@ -282,8 +283,8 @@ function drawScene(time)
     const alt = MathUtils.norm(ISS.r_ECEF);
 
     // Compute longitude and latitude of the Sun and the Moon.
-    let lonlat = sunAltitude.computeSunLonLat(rASun, declSun, JD, JT);
-    let lonlatMoon = moonAltitude.computeMoonLonLat(rAMoon, declMoon, JD, JT);
+    let lonlat = sunAltitude.computeSunLonLat(rASun, declSun, JD, JT, nutPar);
+    let lonlatMoon = moonAltitude.computeMoonLonLat(rAMoon, declMoon, JD, JT, nutPar);
 
     // Update captions.
     updateCaptions(rASun, declSun, lonlat, rAMoon, declMoon, lonlatMoon, today, JT);

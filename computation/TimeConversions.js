@@ -59,9 +59,11 @@ TimeConversions.computeJulianTime = function(d)
  *     Julian day.
  * @param {*} JT 
  *     Julian time.
+ * @param {*} nutPar
+ *     Nutation paramaters. Computed, if missing.
  * @returns Sidereal time (in degrees).
  */
-TimeConversions.computeSiderealTime = function(longitude, JD, JT)
+TimeConversions.computeSiderealTime = function(longitude, JD, JT, nutPar)
 {
     // The following implementation is based on the section A.2.5.2 - CEP to ITRF
     // from ESA - GNSS Data Processing Vol. 1.
@@ -100,7 +102,16 @@ TimeConversions.computeSiderealTime = function(longitude, JD, JT)
     // of the equinoxes is:
     //    dpsi * cosd(eps + deps).
 
-    const nutTerms = Nutation.nutationTerms(T);        
+    let nutTerms = null;
+    if (nutPar === undefined)
+    {
+        console.warn('Nutation parameters not given.');
+        nutTerms = Nutation.nutationTerms(T);        
+    }
+    else 
+    {
+        nutTerms = nutPar;
+    }
     const N11 = MathUtils.cosd(nutTerms.dpsi);
     const N12 = -MathUtils.cosd(nutTerms.eps) * MathUtils.sind(nutTerms.dpsi);
     const GAST = (GMST - MathUtils.atand(N12 / N11) + longitude) % 360.0;

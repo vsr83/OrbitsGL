@@ -388,11 +388,13 @@ class MoonAltitude
      *     Julian day.
      * @param {*} JT 
      *     Julian time.
+     * @param {*} nutPar
+     *     Nutation Parameters.
      * @returns The longitude and latitude.
      */
-    computeMoonLonLat(rA, decl, JD, JT)
+    computeMoonLonLat(rA, decl, JD, JT, nutPar)
     {
-        const ST0 = TimeConversions.computeSiderealTime(0, JD, JT);
+        const ST0 = TimeConversions.computeSiderealTime(0, JD, JT, nutPar);
         const lon = Coordinates.rad2Deg(this.limitAngle(Math.PI + rA - Coordinates.deg2Rad(ST0))) - 180.0;
         let lat = Coordinates.rad2Deg(decl);
  

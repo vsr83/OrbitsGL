@@ -127,7 +127,7 @@
  {
      const T2 = T * T;
      const T3 = T2 * T;
- 
+
      // Obliquity of the ecliptic (A.25).
      const eps = 23.4392911111 - 0.0130041667 * T - 1.6388888889e-07 * T2 + 5.0361111111e-07 * T3;
    
