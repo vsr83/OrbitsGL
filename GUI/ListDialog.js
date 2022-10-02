@@ -20,7 +20,13 @@ ListEnter.onclick = function()
     autoCompleteTargetList.length = 0;
     for (let indElem = 0; indElem < Math.floor(numElem); indElem++)
     {
-        const title = lines[indElem * 3];
+        let title = lines[indElem * 3].trim();
+
+        if (satelliteNames.includes(title))
+        {
+            title = title + "_" + indElem;
+        }
+
         const tleLine1 = lines[indElem * 3 + 1];
         const tleLine2 = lines[indElem * 3 + 2];
         const satrec = satellite.twoline2satrec(tleLine1, tleLine2);
