@@ -9,6 +9,8 @@ Arbitrary satellite orbits can be handled by either SGP4 propagation of NORAD tw
 
 The implementation currently does not store TLEs so they must be downloaded from sources such as [CelesTrak](https://celestrak.com/NORAD/elements/). TLEs must be pasted to the dialog available from the main menu.
 
+The visualization code should be able to handle around 80,000 TLE orbits simultaneously on a M1 Macbook Pro.
+
 Click below to execute in browser.
 [![Screenshot.](scrshot.png)](https://vsr83.github.io/OrbitsGL/)
 
@@ -38,3 +40,9 @@ Arbitrary number of satellites can be visualized as points simultaneously via sp
 ## Keplerian Elements
 
 Orbit can be initialized from Keplerian Elements from the "Keplerian Elements" folder via selection of the Override checkbox. This will generate the current OSV. The OSV can be converted to a TLE as described above.
+
+## Attribution for the Maps and Textures
+
+The JSON Earth map has been generated from [Natural Earth Data](https://www.naturalearthdata.com/) via the website [https://www.naturalearthdata.com/](https://geojson-maps.ash.ms/).
+
+The Earth day and night textures are from the Solar System Scope [website](https://www.solarsystemscope.com/textures/).
