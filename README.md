@@ -43,6 +43,6 @@ Orbit can be initialized from Keplerian Elements from the "Keplerian Elements" f
 
 ## Attribution for the Maps and Textures
 
-The JSON Earth map has been generated from [Natural Earth Data](https://www.naturalearthdata.com/) via the website [https://www.naturalearthdata.com/](https://geojson-maps.ash.ms/).
+The JSON Earth map has been generated from [Natural Earth Data](https://www.naturalearthdata.com/) via the website [https://geojson-maps.ash.ms/](https://geojson-maps.ash.ms/).
 
 The Earth day and night textures are from the Solar System Scope [website](https://www.solarsystemscope.com/textures/).
