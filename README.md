@@ -41,8 +41,10 @@ Arbitrary number of satellites can be visualized as points simultaneously via sp
 
 Orbit can be initialized from Keplerian Elements from the "Keplerian Elements" folder via selection of the Override checkbox. This will generate the current OSV. The OSV can be converted to a TLE as described above.
 
-## Attribution for the Maps and Textures
+## Attributions
 
-The JSON Earth map has been generated from [Natural Earth Data](https://www.naturalearthdata.com/) via the website [https://geojson-maps.ash.ms/](https://geojson-maps.ash.ms/).
-
-The Earth day and night textures are from the Solar System Scope [website](https://www.solarsystemscope.com/textures/).
+1. The JSON Earth map has been generated from [Natural Earth Data](https://www.naturalearthdata.com/) via the website [https://geojson-maps.ash.ms/](https://geojson-maps.ash.ms/).
+2. The Earth day and night textures are from the Solar System Scope [website](https://www.solarsystemscope.com/textures/).
+3. The search bar is implemented with [autoComplete.js](https://tarekraafat.github.io/autoComplete.js/#/). See license at [https://github.com/vsr83/OrbitsGL/tree/main/imports/LICENSE.autoComplete.txt](imports/LICENSE.autoComplete.txt). The CSS style file has been modified. 
+4. The controllers have been implemented with [dat.gui](https://github.com/dataarts/dat.gui). See license at [https://github.com/vsr83/OrbitsGL/tree/main/imports/LICENSE.dat.gui.txt](imports/LICENSE.dat.gui.txt).
+5. The SGP4 propagation has been implemented with the [satellite.js](https://github.com/shashwatak/satellite-js). See license at [https://github.com/vsr83/OrbitsGL/tree/main/imports/LICENSE.satellite.js.txt](imports/LICENSE.satellite.js.txt.txt).
