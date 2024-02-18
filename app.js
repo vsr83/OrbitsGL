@@ -613,8 +613,9 @@ function drawOrbit(today, matrix, kepler_updated, nutPar)
         if (guiControls.source === "TLE")
         {
             const osvTeme = sgp4.propagateTargetTs(satrec, deltaDate, 0.0);
-            const posEci = osvTeme.r;
-            const velEci = osvTeme.v;
+            const osvJ2000 = sgp4.coordTemeJ2000(osvTeme, nutPar);
+            const posEci = osvJ2000.r;
+            const velEci = osvJ2000.v;
             const osvPropJ2000 = {r : [posEci[0] * 1000.0, posEci[1] * 1000.0, posEci[2] * 1000.0],
                        v : [velEci[0], velEci[1], velEci[2]], 
                        ts : deltaDate};
