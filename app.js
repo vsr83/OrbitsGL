@@ -9,7 +9,8 @@ var pointShaders = null;
 var tleLine1 = '1 25544U 98067A   21356.70730882  .00006423  00000+0  12443-3 0  9993',
     tleLine2 = '2 25544  51.6431 130.5342 0004540 343.5826 107.2903 15.49048054317816';
 // Initialize a satellite record
-var satrec = satellite.twoline2satrec(tleLine1, tleLine2);
+var satrec = sgp4.tleFromLines([
+    "ISS (ZARYA)             ", tleLine1, tleLine2]);
 
 // Semi-major and semi-minor axes of the WGS84 ellipsoid.
 var a = 6378.1370;
@@ -123,25 +124,34 @@ function drawScene(time)
     // overwritten below.
     ISS.osv = createOsv(today);
 
-    let osvSatListJ2000 = [];
+    let osvSatListTeme = [];
     if (enableList)
     {
         for (let indSat = 0; indSat < satellites.length; indSat++)
         {
             const sat = satellites[indSat];
-            const positionAndVelocity = satellite.propagate(sat, today);
+            //const positionAndVelocity = satellite.propagate(sat, today);
+
+            // Propagate list items only once every 10 seconds to avoid CPU load.
+            let osvTeme;
+            try {
+                osvTeme = sgp4.propagateTargetTs(sat, today, 10.0);
+            } catch (err) {
+                continue;
+            }
+
             // The position_velocity result is a key-value pair of ECI coordinates.
             // These are the base results from which all other coordinates are derived.
-            const posEci = positionAndVelocity.position;
-            const velEci = positionAndVelocity.velocity;
+            const posEci = osvTeme.r;
+            const velEci = osvTeme.v;
 
             if (typeof posEci !== 'undefined')
             {
                 //console.log(posEci);
-                let osvSat = {r : [posEci.x * 1000.0, posEci.y * 1000.0, posEci.z * 1000.0], 
-                            v : [velEci.x * 1000.0, velEci.y * 1000.0, velEci.z * 1000.0], 
-                            ts: today};
-                osvSatListJ2000.push(osvSat);
+                let osvSat = {r : [osvTeme.r[0] * 1000.0, osvTeme.r[1] * 1000.0, osvTeme.r[2] * 1000.0], 
+                              v : [osvTeme.v[0] * 1000.0, osvTeme.v[1] * 1000.0, osvTeme.v[2] * 1000.0], 
+                              ts: today};
+                osvSatListTeme.push(osvSat);
             }
         }
     }
@@ -253,10 +263,10 @@ function drawScene(time)
 
     if (enableList)
     {
-        for (let indSat = 0; indSat < osvSatListJ2000.length; indSat++)
+        for (let indSat = 0; indSat < osvSatListTeme.length; indSat++)
         {
-            const rJ2000 = osvSatListJ2000[indSat].r;
-            pointsOut.push(MathUtils.vecmul(rJ2000, 0.001));
+            const rTeme = osvSatListTeme[indSat].r;
+            pointsOut.push(MathUtils.vecmul(rTeme, 0.001));
         }
         pointShaders.setGeometry(pointsOut);
     }
@@ -298,7 +308,7 @@ function drawScene(time)
     {
         // Performance : It is significantly faster to perform the J2000->ECEF coordinate
         // transformation in the vertex shader:        
-        const rotMatrixJ2000 = createRotMatrix(today, JD, JT, nutPar);
+        const rotMatrixTeme = createRotMatrix(today, JD, JT, nutPar);
 
         if (guiControls.frame === 'J2000')
         {
@@ -306,7 +316,7 @@ function drawScene(time)
         }
         else
         {
-            pointShaders.draw(m4.multiply(matrix, m4.transpose(rotMatrixJ2000)));            
+            pointShaders.draw(m4.multiply(matrix, m4.transpose(rotMatrixTeme)));
         }
     }
 
@@ -322,7 +332,7 @@ function drawScene(time)
 }
 
 /**
- * Create rotation matrix for J2000 -> ECEF transformation for the point
+ * Create rotation matrix for TEME -> ECEF transformation for the point
  * shader.
  * 
  * @param {*} ts 
@@ -341,9 +351,9 @@ function createRotMatrix(today, JD, JT, nutPar)
     const osvVec1 = {r : [1, 0, 0], v : [0, 0, 0], JT : JT, JD : JD, ts : today};
     const osvVec2 = {r : [0, 1, 0], v : [0, 0, 0], JT : JT, JD : JD, ts : today};
     const osvVec3 = {r : [0, 0, 1], v : [0, 0, 0], JT : JT, JD : JD, ts : today};
-    let osvVec1_ECEF = Frames.osvJ2000ToECEF(osvVec1, nutPar);
-    let osvVec2_ECEF = Frames.osvJ2000ToECEF(osvVec2, nutPar);
-    let osvVec3_ECEF = Frames.osvJ2000ToECEF(osvVec3, nutPar);
+    let osvVec1_ECEF = sgp4.coordTemePef(osvVec1);
+    let osvVec2_ECEF = sgp4.coordTemePef(osvVec2);
+    let osvVec3_ECEF = sgp4.coordTemePef(osvVec3);
     rotMatrixJ2000[0] = osvVec1_ECEF.r[0];
     rotMatrixJ2000[1] = osvVec2_ECEF.r[0];
     rotMatrixJ2000[2] = osvVec3_ECEF.r[0];
@@ -407,28 +417,30 @@ function createOsv(today)
         osvControls.osvVz.setValue(osvOut.v[2]);
     }
     else if (guiControls.source === "TLE")
-    {
-        const positionAndVelocity = satellite.propagate(satrec, today);
-        // The position_velocity result is a key-value pair of ECI coordinates.
-        // These are the base results from which all other coordinates are derived.
-        const positionEci = positionAndVelocity.position;
-        const velocityEci = positionAndVelocity.velocity;
+    {        
+        let osvTeme;
+        try {
+            osvTeme = sgp4.propagateTargetTs(satrec, today, 0.0);
+        } catch (err) {
+            alert(err);
+        }
+        const osvJ2000 = sgp4.coordTemeJ2000(osvTeme);
 
-        osvControls.osvX.setValue(positionEci.x);
-        osvControls.osvY.setValue(positionEci.y);
-        osvControls.osvZ.setValue(positionEci.z);
-        osvControls.osvVx.setValue(velocityEci.x * 1000.0);
-        osvControls.osvVy.setValue(velocityEci.y * 1000.0);
-        osvControls.osvVz.setValue(velocityEci.z * 1000.0);
+        osvControls.osvX.setValue(osvJ2000.r[0]);
+        osvControls.osvY.setValue(osvJ2000.r[1]);
+        osvControls.osvZ.setValue(osvJ2000.r[2]);
+        osvControls.osvVx.setValue(osvJ2000.v[0] * 1000.0);
+        osvControls.osvVy.setValue(osvJ2000.v[1] * 1000.0);
+        osvControls.osvVz.setValue(osvJ2000.v[2] * 1000.0);
 
         osvOut = {r: [
-            positionEci.x * 1000.0, 
-            positionEci.y * 1000.0, 
-            positionEci.z * 1000.0], 
+            osvJ2000.r[0] * 1000.0, 
+            osvJ2000.r[1] * 1000.0, 
+            osvJ2000.r[2] * 1000.0], 
                    v: [
-            velocityEci.x * 1000.0, 
-            velocityEci.y * 1000.0, 
-            velocityEci.z * 1000.0], 
+            osvJ2000.v[0] * 1000.0, 
+            osvJ2000.v[1] * 1000.0, 
+            osvJ2000.v[2] * 1000.0], 
                 ts: today
                 };
         osvControls.osvYear.setValue(today.getFullYear());
@@ -600,11 +612,11 @@ function drawOrbit(today, matrix, kepler_updated, nutPar)
         let z = 0;
         if (guiControls.source === "TLE")
         {
-            const osvProp = satellite.propagate(satrec, deltaDate);
-            const posEci = osvProp.position;
-            const velEci = osvProp.velocity;
-            const osvPropJ2000 = {r : [posEci.x * 1000.0, posEci.y* 1000.0, posEci.z* 1000.0],
-                       v : [velEci.x, velEci.y, velEci.z], 
+            const osvTeme = sgp4.propagateTargetTs(satrec, deltaDate, 0.0);
+            const posEci = osvTeme.r;
+            const velEci = osvTeme.v;
+            const osvPropJ2000 = {r : [posEci[0] * 1000.0, posEci[1] * 1000.0, posEci[2] * 1000.0],
+                       v : [velEci[0], velEci[1], velEci[2]], 
                        ts : deltaDate};
 
             if (guiControls.frame === 'ECEF')
@@ -614,7 +626,7 @@ function drawOrbit(today, matrix, kepler_updated, nutPar)
             }
             else if (guiControls.frame === 'J2000')
             {
-                [x, y, z] = [posEci.x, posEci.y, posEci.z];
+                [x, y, z] = [posEci[0], posEci[1], posEci[2]];
             }
         }
         else
@@ -693,7 +705,7 @@ function drawSun(lonlat, JT, JD, rASun, declSun, matrix, nutPar)
 
     if (guiControls.frame === 'J2000')
     {
-        sunPos = Frames.posECEFToCEP(JT, JD, sunPos);
+        sunPos = Frames.posECEFToCEP(JT, JD, sunPos, nutPar);
         sunPos = Frames.posCEPToJ2000(JT, sunPos, nutPar);
     }
     let sunMatrix = m4.translate(matrix, sunPos[0] * 0.001, sunPos[1] * 0.001, sunPos[2] * 0.001);
@@ -709,7 +721,7 @@ function drawSun(lonlat, JT, JD, rASun, declSun, matrix, nutPar)
 
             if (guiControls.frame === 'J2000')
             {
-                rSubSolarDelta = Frames.posECEFToCEP(JT, JD, rSubSolarDelta);
+                rSubSolarDelta = Frames.posECEFToCEP(JT, JD, rSubSolarDelta, nutPar);
                 rSubSolarDelta = Frames.posCEPToJ2000(JT, rSubSolarDelta, nutPar);
             }
 
@@ -734,7 +746,7 @@ function drawSun(lonlat, JT, JD, rASun, declSun, matrix, nutPar)
 
         if (guiControls.frame === 'J2000')
         {
-            rSubSolarDelta = Frames.posECEFToCEP(JT, JD, rSubSolarDelta);
+            rSubSolarDelta = Frames.posECEFToCEP(JT, JD, rSubSolarDelta, nutPar);
             rSubSolarDelta = Frames.posCEPToJ2000(JT, rSubSolarDelta, nutPar);
         }
     

@@ -21,7 +21,10 @@ TLEEnter.onclick = function()
         if (line1.startsWith('1') && line2.startsWith('2'))
         {
             osvControls.targetName.setValue(targetName);
-            satrec = satellite.twoline2satrec(lines[1], lines[2]);
+
+            const tle = sgp4.tleFromLines(lines);
+            satrec = sgp4.createTarget(tle);
+
             osvControls.source.setValue('TLE');
             updateTLEControls(targetName, line1, line2);
         }

@@ -29,7 +29,12 @@ ListEnter.onclick = function()
 
         const tleLine1 = lines[indElem * 3 + 1];
         const tleLine2 = lines[indElem * 3 + 2];
-        const satrec = satellite.twoline2satrec(tleLine1, tleLine2);
+
+        const tle = sgp4.tleFromLines([
+                lines[indElem * 3],
+                lines[indElem * 3 + 1], 
+                lines[indElem * 3 + 2]]);
+        const satrec = sgp4.createTarget(tle);        
 
         satellites.push(satrec);
         satLines.push([title, tleLine1, tleLine2]);

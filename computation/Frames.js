@@ -238,12 +238,14 @@ Frames.posCEPToECEF = function(JT, JD, rCEP)
  *      Julian date.
  * @param {*} rECEF
  *      Position in ECEF coordinates.
+ * @param {*} nutPar
+ *      Nutation parameters.
  * @returns Position in CEP frame.
  */
-Frames.posECEFToCEP = function(JT, JD, rECEF)
+Frames.posECEFToCEP = function(JT, JD, rECEF, nutPar)
 {
     let osv_ECEF = {};
-    let LST = TimeConversions.computeSiderealTime(0, JD, JT);
+    let LST = TimeConversions.computeSiderealTime(0, JD, JT, nutPar);
     // Apply the Earth Rotation Matrix (A.32):
     rCEP = MathUtils.rotZ(rECEF, LST);
 
