@@ -1,15 +1,13 @@
 # OrbitsGL
 Visualization of elliptic orbits with WebGL.
 
-Simple 3d visualization implemented with WebGL of elliptical orbits of satellites. The computation is mostly based on my earlier project [ISSLive_Sun](https://github.com/vsr83/ISSLive_Sun) but the code supports SGP4 propagation of TLE elements with [satellite.js](https://github.com/shashwatak/satellite-js).
+Simple 3d visualization implemented with WebGL of elliptical orbits of satellites. The computation is mostly based on my earlier project [ISSLive_Sun](https://github.com/vsr83/ISSLive_Sun) but the code supports SGP4 propagation of TLE elements with [SGP4/SDP4](https://github.com/vsr83/SGP4).
 
 By default, the visualization depicts the orbit of the ISS using the ISSLive Lightstreamer feed. Since the Lightstreamer feed seems to be occasionally unreliable, the position data can be obtained from the [Orbit Ephemeris Message](https://spotthestation.nasa.gov/trajectory_data.cfm). Note that the OEM in the repository will get obsolete, if not manually updated. 
 
 Arbitrary satellite orbits can be handled by either SGP4 propagation of NORAD two-line elements (TLE) or via initialization with an arbitrary OSV given in the J2000 frame. The propagation of OSVs in the latter case is performed assuming ideal Kepler orbits. Initialization of an orbit directly using Keplerian Elements is also supported. Any OSV set manually or computed from a Kepler orbit can be also used to generate a TLE for more accurate propagation with SGP4.
 
-The implementation currently does not store TLEs so they must be downloaded from sources such as [CelesTrak](https://celestrak.com/NORAD/elements/). TLEs must be pasted to the dialog available from the main menu.
-
-The visualization code should be able to handle around 80,000 TLE orbits simultaneously on a M1 Macbook Pro.
+The implementation currently does not store TLEs so they must be downloaded from sources such as [CelesTrak](https://celestrak.com/NORAD/elements/). TLEs must be pasted to the dialog available from the main menu. 
 
 Click below to execute in browser.
 [![Screenshot.](scrshot.png)](https://vsr83.github.io/OrbitsGL/)
@@ -47,4 +45,3 @@ Orbit can be initialized from Keplerian Elements from the "Keplerian Elements" f
 2. The Earth day and night textures are from the Solar System Scope [website](https://www.solarsystemscope.com/textures/).
 3. The search bar is implemented with [autoComplete.js](https://tarekraafat.github.io/autoComplete.js/#/). See license at [https://github.com/vsr83/OrbitsGL/tree/main/imports/LICENSE.autoComplete.txt](imports/LICENSE.autoComplete.txt). The CSS style file has been modified. 
 4. The controllers have been implemented with [dat.gui](https://github.com/dataarts/dat.gui). See license at [https://github.com/vsr83/OrbitsGL/tree/main/imports/LICENSE.dat.gui.txt](imports/LICENSE.dat.gui.txt).
-5. The SGP4 propagation has been implemented with the [satellite.js](https://github.com/shashwatak/satellite-js). See license at [https://github.com/vsr83/OrbitsGL/tree/main/imports/LICENSE.satellite.js.txt](imports/LICENSE.satellite.js.txt).
