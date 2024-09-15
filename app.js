@@ -39,6 +39,9 @@ var rotX = MathUtils.deg2Rad(-90);
 var rotY = MathUtils.deg2Rad(0);
 var rotZ = MathUtils.deg2Rad(0);
 
+// JS canvas
+var canvasJs = document.querySelector("#canvasJs");
+var contextJs = canvasJs.getContext("2d");
 
 gl = canvas.getContext("webgl2");
 if (!gl) 
@@ -57,6 +60,7 @@ pointShaders.init();
 var satellites = [];
 var satLines = [];
 var satNameToIndex = [];
+var satIndexToName = [];
 
 requestAnimationFrame(drawScene);
  
@@ -290,9 +294,11 @@ function drawScene(time)
     // Clear the canvas
     gl.clearColor(0, 0, 0, 255);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    contextJs.clearRect(0, 0, canvasJs.width, canvasJs.height);
 
     // Handle screen size updates.
     resizeCanvasToDisplaySize(gl.canvas);
+    resizeCanvasToDisplaySize(canvasJs);
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.CULL_FACE);
@@ -304,11 +310,12 @@ function drawScene(time)
         drawOrbit(today, matrix, kepler_updated, nutPar);
     }
 
+    let rotMatrixTeme;
     if (enableList)
     {
         // Performance : It is significantly faster to perform the J2000->ECEF coordinate
         // transformation in the vertex shader:        
-        const rotMatrixTeme = createRotMatrix(today, JD, JT, nutPar);
+        rotMatrixTeme = createRotMatrix(today, JD, JT, nutPar);
 
         if (guiControls.frame === 'J2000')
         {
@@ -324,6 +331,33 @@ function drawScene(time)
     {
         drawSun(lonlat, JT, JD, rASun, declSun, matrix, nutPar);
     }
+
+    if (enableList && guiControls.showListNames)
+    {
+        // Semi-major axis:
+        const a = 6378137;
+        const cameraPos = [
+            1000 * guiControls.distance * MathUtils.cosd(guiControls.lat)*MathUtils.cosd(guiControls.lon),
+            1000 * guiControls.distance * MathUtils.cosd(guiControls.lat)*MathUtils.sind(guiControls.lon),
+            1000 * guiControls.distance * MathUtils.sind(guiControls.lat)
+        ];
+        
+        for (let indSat = 0; indSat < osvSatListTeme.length; indSat++)
+        {
+            const osvTeme = {r : osvSatListTeme[indSat].r, v : [0, 0, 0], JT : JT, JD : JD, ts : today};
+            if (guiControls.frame === 'J2000')
+            {
+                if (!checkIntersection(cameraPos, osvTeme.r, 6371000))
+                drawCaption(MathUtils.vecsub(osvTeme.r, cameraPos), satIndexToName[indSat], matrix);
+            } else {
+                let targetEcef = sgp4.coordTemePef(osvTeme).r;
+
+                if (!checkIntersection(cameraPos, targetEcef, 6371000))
+                drawCaption(MathUtils.vecsub(targetEcef, cameraPos), satIndexToName[indSat], matrix);
+            }
+        }
+        pointShaders.setGeometry(pointsOut);
+    }    
 
     // Call drawScene again next frame
     requestAnimationFrame(drawScene);
@@ -516,7 +550,7 @@ function createViewMatrix()
 
         cameraControls.lon.setValue(ISS.lon);
     }
-    else if (canvas.onmousemove == null)
+    else if (canvasJs.onmousemove == null)
     {        
         rotZ = MathUtils.deg2Rad(-90 - guiControls.lon);
     }
@@ -528,7 +562,7 @@ function createViewMatrix()
         rotX = MathUtils.deg2Rad(-90 + ISS.lat);
         cameraControls.lat.setValue(ISS.lat);
     }
-    else if (canvas.onmousemove == null)
+    else if (canvasJs.onmousemove == null)
     {
         rotX = MathUtils.deg2Rad(-90 + guiControls.lat);
     }
@@ -761,4 +795,63 @@ function drawSun(lonlat, JT, JD, rASun, declSun, matrix, nutPar)
 
     lineShaders.setGeometry(pSun);
     lineShaders.draw(matrix);
+}
+
+/**
+ * Draw caption.
+ * 
+ * @param {*} rTarget 
+ *      Relative position of the target.
+ * @param {*} caption 
+ *      Caption.
+ * @param {*} matrix
+ *      View Matrix.
+ */
+function drawCaption(rTarget, caption, matrix)
+{
+    contextJs.fillStyle = "rgba(" 
+        + guiControls.colorSatellite[0] + "," 
+        + guiControls.colorSatellite[1] + ","
+        + guiControls.colorSatellite[2] + ")";
+
+    contextJs.textAlign = "center";
+    contextJs.textBaseline = "bottom";
+    contextJs.textAlign = "right";
+    contextJs.strokeStyle = contextJs.fillStyle;
+
+    const clipSpace = m4.transformVector(matrix, [rTarget[0], rTarget[1], rTarget[2], 1]);
+    clipSpace[0] /= clipSpace[3];
+    clipSpace[1] /= clipSpace[3];
+    const pixelX = (clipSpace[0] *  0.5 + 0.5) * gl.canvas.width;
+    const pixelY = (clipSpace[1] * -0.5 + 0.5) * gl.canvas.height;
+    contextJs.fillText(caption + "    ", pixelX, pixelY); 
+}
+
+/**
+ * Check whether there is an Earth intersection in front of the satellite
+ * to be drawn.
+ * 
+ * @param {*} source 
+ *      Camera position.
+ * @param {*} target 
+ *      Satellite position.
+ * @param {*} radius 
+ *      Radius of the sphere.
+ * @returns {*} Whether there is an intersection.
+ */
+function checkIntersection(source, target, radius) 
+{
+    const c = [0, 0, 0];
+    const direction = MathUtils.vecsub(target, source);
+    const distance = MathUtils.norm(direction);
+    const u = MathUtils.vecmul(direction, 1/MathUtils.norm(direction));
+    const lambda = (MathUtils.dot(u, source) ** 2) 
+                 - (MathUtils.norm(source) ** 2 - radius * radius);
+
+    if (lambda >= 0)
+    {
+        const d = - MathUtils.dot(u, source) + Math.sqrt(lambda);
+        return (d < distance);
+    }
+    return false;
 }

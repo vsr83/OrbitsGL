@@ -10,14 +10,15 @@ var drawing = false;
 
 // Get A WebGL context
 var canvas = document.querySelector("#canvas");
+var canvasJs = document.querySelector("#canvasJs");
 
-canvas.addEventListener("mousedown", function(e) {
+canvasJs.addEventListener("mousedown", function(e) {
     xStart = e.clientX;
     yStart = e.clientY;
     dragXStart = -MathUtils.rad2Deg(rotZ);
     dragYStart = -MathUtils.rad2Deg(rotX) - 90;
 
-    canvas.onmousemove = function(m) {
+    canvasJs.onmousemove = function(m) {
         //console.log(m);
         dragX = dragXStart - (m.clientX - xStart) / 10.0;
         dragY = dragYStart - (m.clientY - yStart) / 10.0;
@@ -35,15 +36,15 @@ canvas.addEventListener("mousedown", function(e) {
     }
 });
 
-canvas.addEventListener("mouseup", function(e) {
-    canvas.onmousemove = null;
+canvasJs.addEventListener("mouseup", function(e) {
+    canvasJs.onmousemove = null;
 });
 
-canvas.addEventListener("mouseleave", function(e) {
-    canvas.onmousemove = null;
+canvasJs.addEventListener("mouseleave", function(e) {
+    canvasJs.onmousemove = null;
 });
 
-canvas.addEventListener("wheel", function(e) {
+canvasJs.addEventListener("wheel", function(e) {
     distance *= (e.deltaY * 0.0001 + 1);
     cameraControls.distance.setValue(distance);
 });

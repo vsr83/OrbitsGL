@@ -15,6 +15,7 @@ ListEnter.onclick = function()
     satellites = [];
     satelliteNames = [];
     satNameToIndex = [];
+    satIndexToName = [];
     let innerHTML = "";
 
     autoCompleteTargetList.length = 0;
@@ -41,6 +42,7 @@ ListEnter.onclick = function()
         satelliteNames.push(title);
         autoCompleteTargetList.push(title);
         satNameToIndex[title] = indElem;
+        satIndexToName.push(title)
     }
     satelliteNames.sort();
 

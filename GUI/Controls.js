@@ -50,6 +50,7 @@ function createControls()
         this.deltaMins = 0;
         this.deltaSecs = 0;
         this.showTargetName = true;
+        this.showListNames = false; 
         this.showLocal = false;
         this.showUtc = true;
         this.showJulian = false;
@@ -255,6 +256,7 @@ function createControls()
     displayControls.enableOrbit = displayFolder.add(guiControls, 'enableOrbit').name('Orbit Lines');
     displayControls.enableSun = displayFolder.add(guiControls, 'enableSun').name('Sun Orbit');
     displayControls.enableList = displayFolder.add(guiControls, 'enableList').name('Show List');
+    displayControls.enableListNames = displayFolder.add(guiControls, 'showListNames').name('Show Names');
     //displayFolder.add(guiControls, 'enableMoon').name('Show Moon');
     const lonControl = displayFolder.add(guiControls, 'gridLonResolution', 1, 180, 1)
     .name('Grid Lon. Resolution')

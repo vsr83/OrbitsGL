@@ -10,6 +10,11 @@ MathUtils.cross = function(u, v)
             u[0]*v[1] - u[1]*v[0]];
 }
 
+MathUtils.dot = function(u, v) 
+{
+    return u[0]*v[0] + u[1]*v[1] + u[2]*v[2];
+}
+
 MathUtils.norm = function(u)
 {
     return Math.sqrt(u[0]*u[0] + u[1]*u[1] + u[2]*u[2]);
